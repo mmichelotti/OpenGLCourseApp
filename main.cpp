@@ -25,7 +25,6 @@ bool direction = true;
 float triOffset = 0.0f;
 float triMaxOffset = 0.7f;
 float triIncrement = 0.0005f;
-float test = 0.0f;
 
 //Vertex Shader
 static const char* vShader = 
