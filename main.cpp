@@ -34,6 +34,13 @@ float triIncrement = 0.0005f;
 
 float curAngle = 0.0f;
 
+bool sizeDirection = true;
+float curSize = 0.4f;
+float maxSize = 0.8f;
+float minSize = 0.1f;
+
+
+
 //Vertex Shader
 static const char* vShader = 
 "																							\n\
@@ -41,11 +48,11 @@ static const char* vShader =
 																							\n\
 layout (location = 0) in vec3 pos;															\n\
 																							\n\
-uniform mat4 model;																						\n\
+uniform mat4 model;																			\n\
 																							\n\
 void main()																					\n\
 {																							\n\
-		gl_Position = model * vec4(pos.xyz/2, 1.0);													\n\
+		gl_Position = model * vec4(pos, 1.0f);												\n\
 }																							\n\
 ";
 
@@ -206,20 +213,20 @@ int main()
 	{
 		glfwPollEvents(); //Get and handle user input events
 
-		if (direction)
-		{
-			triOffset += triIncrement;
-		}
-		else
-		{
-			triOffset -= triIncrement;
-		}
+		if (direction) triOffset += triIncrement;
+		else triOffset -= triIncrement;
 		if (abs(triOffset) >= triMaxOffset)
 		{
 			direction = !direction;
+			sizeDirection = !sizeDirection;
 		}
+
 		curAngle += 0.01f;
 		if (curAngle >= 360) curAngle -= 360;
+
+		if (sizeDirection) curSize += 0.0001f;
+		else curSize -= 0.0001f;
+
 
 		//Clear the whole window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); //Set it to white
@@ -230,16 +237,20 @@ int main()
 
 		
 		glm::mat4 model(1.0f); //create identity matrix 
-		//1 0 0 0 
-		//0 1 0 0
-		//0 0 1 0
-		//0 0 0 1
+			//1 0 0 0 
+			//0 1 0 0
+			//0 0 1 0
+			//0 0 0 1
 		model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f)); //translate the uniform model on the X
-		//uniform variables are a constant through all the shader, not influenced by each single vertex
+			//uniform variables are a constant through all the shader, not influenced by each single vertex
 		model = glm::rotate(model, curAngle * toRadians, glm::vec3(0.0f, 0.0f, 1.0f)); //rotate n degrees around the z axis
-		//of course the objects distorts becuase there is no projection matrix applied to the geometry
-		//the default matrix system is the window coordinate system, so as we rotate an object on a non uniform window
-		//the object will deform to match the window coordynate system
+			//of course the objects distorts becuase there is no projection matrix applied to the geometry
+			//the default matrix system is the window coordinate system, so as we rotate an object on a non uniform window
+			//the object will deform to match the window coordynate system
+		model = glm::scale(model, glm::vec3(curSize, curSize, 1.0f));
+			//so the order matters, even when scaling
+			//to make translations absolute we need to apply them first
+			//if we want them relative we need to apply after
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
