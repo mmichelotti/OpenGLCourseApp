@@ -32,6 +32,8 @@ float triOffset = 0.0f;
 float triMaxOffset = 0.7f;
 float triIncrement = 0.0005f;
 
+float curAngle = 0.0f;
+
 //Vertex Shader
 static const char* vShader = 
 "																							\n\
@@ -216,6 +218,9 @@ int main()
 		{
 			direction = !direction;
 		}
+		curAngle += 0.01f;
+		if (curAngle >= 360) curAngle -= 360;
+
 		//Clear the whole window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); //Set it to white
 		glClear(GL_COLOR_BUFFER_BIT); //Clear other pixel informations (a pixel contains more than colors)
@@ -231,8 +236,10 @@ int main()
 		//0 0 0 1
 		model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f)); //translate the uniform model on the X
 		//uniform variables are a constant through all the shader, not influenced by each single vertex
-		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 0.0f, 1.0f)); //rotate n degrees around the z axis
+		model = glm::rotate(model, curAngle * toRadians, glm::vec3(0.0f, 0.0f, 1.0f)); //rotate n degrees around the z axis
 		//of course the objects distorts becuase there is no projection matrix applied to the geometry
+		//the default matrix system is the window coordinate system, so as we rotate an object on a non uniform window
+		//the object will deform to match the window coordynate system
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
