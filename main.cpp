@@ -1,9 +1,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <cmath>
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
+#include <GLM/glm.hpp>
+#include <GLM/gtc/matrix_transform.hpp>
+#include <GLM/gtc/type_ptr.hpp>
 
 //GL => The actual graphics API
 //GLEW => OpenGL Extensions for additional OpenGL features and extensions, since OpenGL can differ across platforms
@@ -19,7 +23,7 @@ const GLint WIDTH = 800, HEIGHT = 600;
 GLuint VAO; //Vertex Array Object, it will hjold multiple VBO and other types of buffer
 GLuint VBO; //Vertex Buffer Object
 GLuint shader;
-GLuint uniformXMove;
+GLuint uniformModel;
 
 bool direction = true;
 float triOffset = 0.0f;
@@ -33,11 +37,11 @@ static const char* vShader =
 																							\n\
 layout (location = 0) in vec3 pos;															\n\
 																							\n\
-uniform float xMove;																						\n\
+uniform mat4 model;																						\n\
 																							\n\
 void main()																					\n\
 {																							\n\
-		gl_Position = vec4(pos.xyz/2 + xMove, 1.0);													\n\
+		gl_Position = model * vec4(pos.xyz/2, 1.0);													\n\
 }																							\n\
 ";
 
@@ -140,7 +144,7 @@ void CompileShaders()
 		return;
 	}
 
-	uniformXMove = glGetUniformLocation(shader, "xMove");
+	uniformModel = glGetUniformLocation(shader, "model");
 }
 
 
@@ -214,9 +218,21 @@ int main()
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); //Set it to white
 		glClear(GL_COLOR_BUFFER_BIT); //Clear other pixel informations (a pixel contains more than colors)
 
-		//Bind shader and VAO
+		//Bind shader
 		glUseProgram(shader);
-		glUniform1f(uniformXMove,triOffset);
+
+		
+		glm::mat4 model(1.0f); //create identity matrix 
+		//1 0 0 0 
+		//0 1 0 0
+		//0 0 1 0
+		//0 0 0 1
+		model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f)); //translate the uniform model on the X
+		//uniform variables are a constant through all the shader, not influenced by each single vertex
+
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+
+		//Bind VAO
 		glBindVertexArray(VAO);
 
 		glDrawArrays(GL_TRIANGLES, 0, 3);
