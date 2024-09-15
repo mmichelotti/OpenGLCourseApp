@@ -20,10 +20,12 @@ It provides a platform-independent API for windowing and input.
 */
 
 const GLint WIDTH = 800, HEIGHT = 600;
+const float toRadians = 3.14159265f / 180.0f; //converting a full circle from 2PI to 360*
 GLuint VAO; //Vertex Array Object, it will hjold multiple VBO and other types of buffer
 GLuint VBO; //Vertex Buffer Object
 GLuint shader;
 GLuint uniformModel;
+
 
 bool direction = true;
 float triOffset = 0.0f;
@@ -229,6 +231,8 @@ int main()
 		//0 0 0 1
 		model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f)); //translate the uniform model on the X
 		//uniform variables are a constant through all the shader, not influenced by each single vertex
+		model = glm::rotate(model, 90 * toRadians, glm::vec3(0.0f, 0.0f, 1.0f)); //rotate n degrees around the z axis
+		//of course the objects distorts becuase there is no projection matrix applied to the geometry
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
