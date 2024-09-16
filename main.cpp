@@ -234,6 +234,8 @@ int main()
 		return 1;
 	}
 
+	glEnable(GL_DEPTH_TEST);
+
 	//Setup Viewport Size
 	glViewport(0, 0, bufferWidth, bufferHeight);
 
@@ -262,7 +264,7 @@ int main()
 
 		//Clear the whole window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); //Set it to white
-		glClear(GL_COLOR_BUFFER_BIT); //Clear other pixel informations (a pixel contains more than colors)
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Clear other pixel informations (in this case color and depth buffer)
 
 		//Bind shader
 		glUseProgram(shader);
