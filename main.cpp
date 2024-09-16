@@ -12,6 +12,7 @@
 
 #include "Mesh.h"
 #include "Shader.h"
+#include "Window.h"
 
 //GL => The actual graphics API
 //GLEW => OpenGL Extensions for additional OpenGL features and extensions, since OpenGL can differ across platforms
@@ -35,6 +36,7 @@ i.e. in the vertex buffer a cube is composed of 2 tris, which in total are 6 ver
 th Index Buffer recycle those overlapping vertices, so it has a total of 4
 */
 
+Window mainWindow;
 std::vector<Mesh*> meshes;
 std::vector<Shader> shaders;
 
@@ -94,51 +96,8 @@ void CreateShaders()
 }
 int main()
 {
-	//Initialize GLFW 
-	if (!glfwInit())
-	{
-		printf("Can't Init GLFW");
-		glfwTerminate();
-		return 1;
-	}
-
-	//Setup GLFW Window Properties to v3.3
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // No backwards compatibility
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // Yes forward compatibility
-	GLFWwindow* mainWindow = glfwCreateWindow(WIDTH, HEIGHT, "Test Window", NULL, NULL);
-	if (!mainWindow)
-	{
-		printf("GLFW can't create window");
-		glfwTerminate();
-		return 1;
-	}
-
-	//Get Buffer size information
-	int bufferWidth, bufferHeight;
-	glfwGetFramebufferSize(mainWindow, &bufferWidth, &bufferHeight); //read the window and return width and height to our variables
-
-	//Set the context for GLEW to use
-	glfwMakeContextCurrent(mainWindow);
-
-	//Allow modern extension features
-	glewExperimental = GL_TRUE;
-
-
-	//Initialize GLEW
-	if (glewInit() != GLEW_OK)
-	{
-		printf("Can't Init GLEW");
-		glfwDestroyWindow(mainWindow);
-		glfwTerminate();
-		return 1;
-	}
-
-	glEnable(GL_DEPTH_TEST);
-
-	//Setup Viewport Size
-	glViewport(0, 0, bufferWidth, bufferHeight);
+	mainWindow = Window(800, 600);
+	mainWindow.Initialize();
 
 	CreateObjects();
 	CreateShaders();
@@ -146,10 +105,10 @@ int main()
 	GLuint uniformProjection = 0;
 	GLuint uniformModel = 0;
 
-	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)bufferWidth / (GLfloat)bufferHeight, 0.1f, 100.0f);
-
+	glm::mat4 projection = glm::perspective(45.0f, mainWindow.GetAspectRatio(), 0.1f, 100.0f);
+	
 	//Main Loop
-	while (!glfwWindowShouldClose(mainWindow))
+	while (!mainWindow.ShouldClose())
 	{
 		glfwPollEvents(); //Get and handle user input events
 
@@ -204,7 +163,7 @@ int main()
 
 		glUseProgram(0);
 
-		glfwSwapBuffers(mainWindow);
+		mainWindow.SwapBuffers();
 	}
 
 	return 0;
