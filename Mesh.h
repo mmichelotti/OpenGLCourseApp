@@ -5,10 +5,12 @@ class Mesh
 {
 public:
 	Mesh();
-	~Mesh();
+	
 	void Create(GLfloat *vertices, unsigned int *indices, unsigned int verticesAmount, unsigned int indicesAmount);
 	void Render();
 	void Clear();
+
+	~Mesh();
 
 private:
 	GLuint VAO; //Vertex Array Object, it will hjold multiple VBO and other types of buffer

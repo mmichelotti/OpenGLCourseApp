@@ -11,6 +11,7 @@
 #include <GLM/gtc/type_ptr.hpp>
 
 #include "Mesh.h"
+#include "Shader.h"
 
 //GL => The actual graphics API
 //GLEW => OpenGL Extensions for additional OpenGL features and extensions, since OpenGL can differ across platforms
@@ -34,11 +35,8 @@ i.e. in the vertex buffer a cube is composed of 2 tris, which in total are 6 ver
 th Index Buffer recycle those overlapping vertices, so it has a total of 4
 */
 
-GLuint shader;
-GLuint uniformModel;
-GLuint uniformProjection;
-
-std::vector<Mesh*> meshList;
+std::vector<Mesh*> meshes;
+std::vector<Shader> shaders;
 
 
 bool direction = true;
@@ -90,7 +88,7 @@ void main()																					\n\
 ";
 
 
-void CreateTriangle() 
+void CreateObjects() 
 {
 	//switched from tri to pyramid
 
@@ -112,76 +110,17 @@ void CreateTriangle()
 	Mesh* obj = new Mesh();
 	obj->Create(vertices, indices, 12,12);
 	//-> this syntax is like "." the differnece is that since obj is a pointer, this is the syntax to access its public members
-	meshList.push_back(obj);
+	meshes.push_back(obj);
 }
 
-void AddShader(GLuint program, const char* code, GLenum shaderType) 
+
+
+void CreateShaders() 
 {
-	GLuint shader = glCreateShader(shaderType);
-
-	const GLchar* text[1];
-	text[0] = code;
-
-	GLint codeLength[1];
-	codeLength[0] = strlen(code);
-
-	glShaderSource(shader, 1, text, codeLength);
-	glCompileShader(shader);
-
-	GLint result = 0;
-	GLchar eLog[1024] = { 0 };
-
-	glGetShaderiv(shader, GL_COMPILE_STATUS, &result);
-	if (!result)
-	{
-		glGetShaderInfoLog(shader, sizeof(eLog), NULL, eLog);
-		printf("Error compiling the %d shader, '%s \n", shaderType, eLog);
-		return;
-	}
-
-	glAttachShader(program, shader);
+	Shader *shader1 = new Shader();
+	shader1->CreateFromString(vShader, fShader);
+	shaders.push_back(*shader1);
 }
-
-
-void CompileShaders() 
-{
-	shader = glCreateProgram();
-	if (!shader) 
-	{
-		printf("Can't create shader program");
-		return;
-	}
-
-	AddShader(shader, vShader, GL_VERTEX_SHADER);
-	AddShader(shader, fShader, GL_FRAGMENT_SHADER);
-
-	GLint result = 0;
-	GLchar eLog[1024] = { 0 };
-
-	glLinkProgram(shader);
-
-	glGetProgramiv(shader, GL_LINK_STATUS, &result);
-	if(!result)
-	{
-		glGetProgramInfoLog(shader, sizeof(eLog), NULL, eLog);
-		printf("Error linking program, '%s \n", eLog);
-		return;
-	}
-	glValidateProgram(shader);
-
-	glGetProgramiv(shader, GL_VALIDATE_STATUS, &result);
-	if (!result)
-	{
-		glGetProgramInfoLog(shader, sizeof(eLog), NULL, eLog);
-		printf("Error validating program, '%s \n", eLog);
-		return;
-	}
-
-	uniformModel = glGetUniformLocation(shader, "model");
-	uniformProjection = glGetUniformLocation(shader, "projection");
-}
-
-
 int main()
 {
 	//Initialize GLFW 
@@ -230,10 +169,12 @@ int main()
 	//Setup Viewport Size
 	glViewport(0, 0, bufferWidth, bufferHeight);
 
-	CreateTriangle();
-	CompileShaders();
+	CreateObjects();
+	CreateShaders();
 
-	
+	GLuint uniformProjection = 0;
+	GLuint uniformModel = 0;
+
 	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)bufferWidth / (GLfloat)bufferHeight, 0.1f, 100.0f);
 
 	//Main Loop
@@ -261,7 +202,9 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Clear other pixel informations (in this case color and depth buffer)
 
 		//Bind shader
-		glUseProgram(shader);
+		shaders[0].Use();
+		uniformModel = shaders[0].GetModelLocation();
+		uniformProjection = shaders[0].GetProjectionLocation();
 
 		
 		glm::mat4 model(1.0f); //create identity matrix 
@@ -286,7 +229,7 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 
-		meshList[0]->Render();
+		meshes[0]->Render();
 
 		glUseProgram(0);
 
