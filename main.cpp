@@ -47,12 +47,14 @@ static const char* vShader =
 #version 330																				\n\
 																							\n\
 layout (location = 0) in vec3 pos;															\n\
+out vec4 vCol;																				\n\
 																							\n\
 uniform mat4 model;																			\n\
 																							\n\
 void main()																					\n\
 {																							\n\
 		gl_Position = model * vec4(pos, 1.0f);												\n\
+		vCol = vec4(clamp(pos,0.0f,1.0f), 1.0f);													\n\
 }																							\n\
 ";
 
@@ -61,10 +63,14 @@ static const char* fShader =
 "																							\n\
 #version 330																				\n\
 																							\n\
+																							\n\
+in vec4 vCol;																				\n\
+																							\n\
+																							\n\
 out vec4 color;																				\n\
 void main()																					\n\
 {																							\n\
-		color = vec4(1.0,0.0,0.0,1.0);													    \n\
+		color = vCol;																	    \n\
 }																							\n\
 ";
 
@@ -241,13 +247,13 @@ int main()
 			//0 1 0 0
 			//0 0 1 0
 			//0 0 0 1
-		model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f)); //translate the uniform model on the X
+		//model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f)); //translate the uniform model on the X
 			//uniform variables are a constant through all the shader, not influenced by each single vertex
-		model = glm::rotate(model, curAngle * toRadians, glm::vec3(0.0f, 0.0f, 1.0f)); //rotate n degrees around the z axis
+		//model = glm::rotate(model, curAngle * toRadians, glm::vec3(0.0f, 0.0f, 1.0f)); //rotate n degrees around the z axis
 			//of course the objects distorts becuase there is no projection matrix applied to the geometry
 			//the default matrix system is the window coordinate system, so as we rotate an object on a non uniform window
 			//the object will deform to match the window coordynate system
-		model = glm::scale(model, glm::vec3(curSize, curSize, 1.0f));
+		//model = glm::scale(model, glm::vec3(curSize, curSize, 1.0f));
 			//so the order matters, even when scaling
 			//to make translations absolute we need to apply them first
 			//if we want them relative we need to apply after
