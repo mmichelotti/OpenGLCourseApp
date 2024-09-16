@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <cmath>
+#include <vector>
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -8,6 +9,8 @@
 #include <GLM/glm.hpp>
 #include <GLM/gtc/matrix_transform.hpp>
 #include <GLM/gtc/type_ptr.hpp>
+
+#include "Mesh.h"
 
 //GL => The actual graphics API
 //GLEW => OpenGL Extensions for additional OpenGL features and extensions, since OpenGL can differ across platforms
@@ -23,9 +26,7 @@ const GLint WIDTH = 800, HEIGHT = 600;
 const float toRadians = 3.14159265f / 180.0f; //converting a full circle from 2PI to 360*
 
 
-GLuint VAO; //Vertex Array Object, it will hjold multiple VBO and other types of buffer
-GLuint VBO; //Vertex Buffer Object
-GLuint IBO; //Index Buffer Object
+
 /*
 An index buffer is mostly identical to a vertex buffer
 The core difference is that the index buffer groups the vertices that are overlapping
@@ -36,6 +37,8 @@ th Index Buffer recycle those overlapping vertices, so it has a total of 4
 GLuint shader;
 GLuint uniformModel;
 GLuint uniformProjection;
+
+std::vector<Mesh*> meshList;
 
 
 bool direction = true;
@@ -106,27 +109,10 @@ void CreateTriangle()
 	     1.0,  -1.0f, 0.0f,
 		 0.0f,  1.0f, 0.0f
 	};
-	//generate VAO VBO IBO
-	glGenVertexArrays(1, &VAO);
-	glGenBuffers(1, &VBO);
-	glGenBuffers(1, &IBO);
-
-	//Bind VAO VBO IBO
-	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-	glVertexAttribPointer(0,3, GL_FLOAT, GL_FALSE, 0, 0);
-	glEnableVertexAttribArray(0);
-
-	//Unbind VAO and VBO
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	
-
+	Mesh* obj = new Mesh();
+	obj->Create(vertices, indices, 12,12);
+	//-> this syntax is like "." the differnece is that since obj is a pointer, this is the syntax to access its public members
+	meshList.push_back(obj);
 }
 
 void AddShader(GLuint program, const char* code, GLenum shaderType) 
@@ -300,14 +286,8 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 
-		//Bind VAO IBO
-		glBindVertexArray(VAO);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-		glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+		meshList[0]->Render();
 
-		//Unbind shader and VAO
-		glBindVertexArray(0);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glUseProgram(0);
 
 		glfwSwapBuffers(mainWindow);
