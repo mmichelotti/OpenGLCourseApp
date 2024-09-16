@@ -23,6 +23,14 @@ const GLint WIDTH = 800, HEIGHT = 600;
 const float toRadians = 3.14159265f / 180.0f; //converting a full circle from 2PI to 360*
 GLuint VAO; //Vertex Array Object, it will hjold multiple VBO and other types of buffer
 GLuint VBO; //Vertex Buffer Object
+GLuint IBO; //Index Buffer Object
+/*
+An index buffer is mostly identical to a vertex buffer
+The core difference is that the index buffer groups the vertices that are overlapping
+i.e. in the vertex buffer a cube is composed of 2 tris, which in total are 6 vertices 
+th Index Buffer recycle those overlapping vertices, so it has a total of 4
+*/
+
 GLuint shader;
 GLuint uniformModel;
 
@@ -77,25 +85,43 @@ void main()																					\n\
 
 void CreateTriangle() 
 {
+	//switched from tri to pyramid
+
+	unsigned int indices[] =
+	{
+		0, 3, 1,
+		1, 3, 2,
+		2, 3, 0,
+		0, 1, 2
+	};
+	
 	GLfloat vertices[] =
 	{
 		-1.0f, -1.0f, 0.0f,
+		 0.0f, -1.0f, 1.0f,
 	     1.0,  -1.0f, 0.0f,
 		 0.0f,  1.0f, 0.0f
 	};
-	//generate and bind VAO and VBO
+	//generate VAO VBO IBO
 	glGenVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
 	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glGenBuffers(1, &IBO);
 
+	//Bind VAO VBO IBO
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+
 	glVertexAttribPointer(0,3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(0);
 
 	//Unbind VAO and VBO
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	
 
 }
 
@@ -249,7 +275,7 @@ int main()
 			//0 0 0 1
 		//model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f)); //translate the uniform model on the X
 			//uniform variables are a constant through all the shader, not influenced by each single vertex
-		//model = glm::rotate(model, curAngle * toRadians, glm::vec3(0.0f, 0.0f, 1.0f)); //rotate n degrees around the z axis
+		model = glm::rotate(model, curAngle * toRadians, glm::vec3(0.0f, 1.0f, 0.0f)); //rotate n degrees around the z axis
 			//of course the objects distorts becuase there is no projection matrix applied to the geometry
 			//the default matrix system is the window coordinate system, so as we rotate an object on a non uniform window
 			//the object will deform to match the window coordynate system
@@ -260,14 +286,14 @@ int main()
 
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 
-		//Bind VAO
+		//Bind VAO IBO
 		glBindVertexArray(VAO);
-
-		glDrawArrays(GL_TRIANGLES, 0, 3);
-
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
+		glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
 
 		//Unbind shader and VAO
 		glBindVertexArray(0);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		glUseProgram(0);
 
 		glfwSwapBuffers(mainWindow);
