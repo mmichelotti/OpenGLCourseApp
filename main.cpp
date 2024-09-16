@@ -21,6 +21,8 @@ It provides a platform-independent API for windowing and input.
 
 const GLint WIDTH = 800, HEIGHT = 600;
 const float toRadians = 3.14159265f / 180.0f; //converting a full circle from 2PI to 360*
+
+
 GLuint VAO; //Vertex Array Object, it will hjold multiple VBO and other types of buffer
 GLuint VBO; //Vertex Buffer Object
 GLuint IBO; //Index Buffer Object
@@ -33,6 +35,7 @@ th Index Buffer recycle those overlapping vertices, so it has a total of 4
 
 GLuint shader;
 GLuint uniformModel;
+GLuint uniformProjection;
 
 
 bool direction = true;
@@ -58,11 +61,12 @@ layout (location = 0) in vec3 pos;															\n\
 out vec4 vCol;																				\n\
 																							\n\
 uniform mat4 model;																			\n\
+uniform mat4 projection;																	\n\
 																							\n\
 void main()																					\n\
 {																							\n\
-		gl_Position = model * vec4(pos, 1.0f);												\n\
-		vCol = vec4(clamp(pos,0.0f,1.0f), 1.0f);													\n\
+		gl_Position = projection * model * vec4(pos, 1.0f);									\n\
+		vCol = vec4(clamp(pos,0.0f,1.0f), 1.0f);											\n\
 }																							\n\
 ";
 
@@ -188,6 +192,7 @@ void CompileShaders()
 	}
 
 	uniformModel = glGetUniformLocation(shader, "model");
+	uniformProjection = glGetUniformLocation(shader, "projection");
 }
 
 
@@ -242,6 +247,9 @@ int main()
 	CreateTriangle();
 	CompileShaders();
 
+	
+	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)bufferWidth / (GLfloat)bufferHeight, 0.1f, 100.0f);
+
 	//Main Loop
 	while (!glfwWindowShouldClose(mainWindow))
 	{
@@ -275,8 +283,9 @@ int main()
 			//0 1 0 0
 			//0 0 1 0
 			//0 0 0 1
-		//model = glm::translate(model, glm::vec3(triOffset, 0.0f, 0.0f)); //translate the uniform model on the X
+		model = glm::translate(model, glm::vec3(0.0f, triOffset*3, -5.0f)); //translate the uniform further so we can see it on the projection matrix
 			//uniform variables are a constant through all the shader, not influenced by each single vertex
+
 		model = glm::rotate(model, curAngle * toRadians, glm::vec3(0.0f, 1.0f, 0.0f)); //rotate n degrees around the z axis
 			//of course the objects distorts becuase there is no projection matrix applied to the geometry
 			//the default matrix system is the window coordinate system, so as we rotate an object on a non uniform window
@@ -286,7 +295,10 @@ int main()
 			//to make translations absolute we need to apply them first
 			//if we want them relative we need to apply after
 
+
+
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 
 		//Bind VAO IBO
 		glBindVertexArray(VAO);
