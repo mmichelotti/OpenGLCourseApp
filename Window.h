@@ -14,9 +14,10 @@ public:
 
 	int Initialize();
 
-	GLfloat GetBufferWidth() { return bufferSIze.x; }
-	GLfloat GetBufferHeight() { return bufferSIze.y; }
-	GLfloat GetAspectRatio() { return bufferSIze.x / bufferSIze.y; }
+	GLfloat GetBufferWidth() { return bufferSize.x; }
+	GLfloat GetBufferHeight() { return bufferSize.y; }
+	GLfloat GetAspectRatio() { return bufferSize.x / bufferSize.y; }
+
 	Vec2<GLfloat> GetChange();
 
 	bool ShouldClose() { return glfwWindowShouldClose(window); }
@@ -26,17 +27,17 @@ public:
 	~Window();
 
 private:
+
 	GLFWwindow* window;
 
 	Vec2<GLint> initialSize;
-	Vec2<GLint> bufferSIze;
+	Vec2<GLint> bufferSize;
 
 	bool keys[1024];
 	bool mouseFirstMoved;
 
 	Vec2<GLfloat> lastPos;
 	Vec2<GLfloat> deltaPos;
-
 
 	void CreateCallbacks();
 	static void HandleKeys(GLFWwindow* window, int key, int code, int action, int mode);

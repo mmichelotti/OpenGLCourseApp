@@ -42,7 +42,7 @@ int Window::Initialize()
 	}
 
 	//Get Buffer size information
-	glfwGetFramebufferSize(window, &bufferSIze.x, &bufferSIze.y); //read the window and return width and height to our variables
+	glfwGetFramebufferSize(window, &bufferSize.x, &bufferSize.y); //read the window and return width and height to our variables
 
 	//Set the context for GLEW to use
 	glfwMakeContextCurrent(window);
@@ -69,7 +69,7 @@ int Window::Initialize()
 	
 
 	//Setup Viewport Size
-	glViewport(0, 0, bufferSIze.x, bufferSIze.y);
+	glViewport(0, 0, bufferSize.x, bufferSize.y);
 
 	glfwSetWindowUserPointer(window, this);
 }
@@ -111,24 +111,15 @@ void Window::HandleKeys(GLFWwindow* window, int key, int code, int action, int m
 
 void Window::HandleMouse(GLFWwindow* window, double xPos, double yPos)
 {
-	//vec2(t) constructor doenst work properly
 	Window* currentWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
 	if (currentWindow->mouseFirstMoved)
 	{
-		Vec2<GLfloat>test;
-		currentWindow->lastPos.x = xPos;
-		currentWindow->lastPos.y = yPos;
-		//currentWindow->lastPos = (xPos, yPos);
+		currentWindow->lastPos = Vec2<GLint>(xPos, yPos);
 		currentWindow->mouseFirstMoved = false;
 	}
 	currentWindow->deltaPos.x = xPos - currentWindow->lastPos.x;
 	currentWindow->deltaPos.y = currentWindow->lastPos.y - yPos;
-	currentWindow->lastPos.x = xPos;
-	currentWindow->lastPos.y = yPos;
-
-	//currentWindow->lastPos = (xPos, yPos);
-
-	printf("x: %.6f, y:%.6f \n", currentWindow->deltaPos.x, currentWindow->deltaPos.y);
+	currentWindow->lastPos = Vec2<GLint>(xPos, yPos);
 }
 
 Window::~Window()
