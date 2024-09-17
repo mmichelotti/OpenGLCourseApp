@@ -35,7 +35,7 @@ private:
 	bool mouseFirstMoved;
 
 	Vec2<GLfloat> lastPos;
-	Vec2<GLfloat> changedPos;
+	Vec2<GLfloat> deltaPos;
 
 
 	void CreateCallbacks();

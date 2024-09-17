@@ -16,9 +16,11 @@ public:
     Vec2(const Vec2<T>& other) : x(other.x), y(other.y) {}
 
     // Conversion constructor
+    
     template<typename U>
     Vec2(const Vec2<U>& other, typename enable_if<is_convertible<U, T>::value, U>::type* = 0)
         : x(static_cast<T>(other.x)), y(static_cast<T>(other.y)) {}
+    
 
     // Subtraction operator for Vec2
     template<typename U>

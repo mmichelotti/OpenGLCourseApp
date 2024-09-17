@@ -1,4 +1,5 @@
 #include "Window.h"
+#include <stdio.h>
 
 Window::Window()
 {
@@ -75,8 +76,8 @@ int Window::Initialize()
 
 Vec2<GLfloat> Window::GetChange()
 {
-	Vec2<GLfloat> change = changedPos;
-	changedPos = (0, 0);
+	Vec2<GLfloat> change = deltaPos;
+	deltaPos = (0, 0);
 	return change;
 }
 
@@ -110,19 +111,24 @@ void Window::HandleKeys(GLFWwindow* window, int key, int code, int action, int m
 
 void Window::HandleMouse(GLFWwindow* window, double xPos, double yPos)
 {
+	//vec2(t) constructor doenst work properly
 	Window* currentWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
 	if (currentWindow->mouseFirstMoved)
 	{
+		Vec2<GLfloat>test;
 		currentWindow->lastPos.x = xPos;
 		currentWindow->lastPos.y = yPos;
+		//currentWindow->lastPos = (xPos, yPos);
 		currentWindow->mouseFirstMoved = false;
 	}
-	currentWindow->changedPos.x = xPos - currentWindow->lastPos.x;
-	currentWindow->changedPos.y = currentWindow->lastPos.y - yPos;
+	currentWindow->deltaPos.x = xPos - currentWindow->lastPos.x;
+	currentWindow->deltaPos.y = currentWindow->lastPos.y - yPos;
 	currentWindow->lastPos.x = xPos;
 	currentWindow->lastPos.y = yPos;
 
-	printf("x: %.6f, y:%.6f \n", currentWindow->changedPos.x, currentWindow->changedPos.y);
+	//currentWindow->lastPos = (xPos, yPos);
+
+	printf("x: %.6f, y:%.6f \n", currentWindow->deltaPos.x, currentWindow->deltaPos.y);
 }
 
 Window::~Window()
