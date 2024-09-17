@@ -41,7 +41,7 @@ int Window::Initialize()
 	}
 
 	//Get Buffer size information
-	glfwGetFramebufferSize(window, &buffer.x, &buffer.y); //read the window and return width and height to our variables
+	glfwGetFramebufferSize(window, &bufferSIze.x, &bufferSIze.y); //read the window and return width and height to our variables
 
 	//Set the context for GLEW to use
 	glfwMakeContextCurrent(window);
@@ -49,8 +49,9 @@ int Window::Initialize()
 	//Allow modern extension features
 	glewExperimental = GL_TRUE;
 
-	//
+	// Handle Key and Mouse inputs
 	CreateCallbacks();
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 
 	//Initialize GLEW
@@ -67,9 +68,16 @@ int Window::Initialize()
 	
 
 	//Setup Viewport Size
-	glViewport(0, 0, buffer.x, buffer.y);
+	glViewport(0, 0, bufferSIze.x, bufferSIze.y);
 
 	glfwSetWindowUserPointer(window, this);
+}
+
+Vec2<GLfloat> Window::GetChange()
+{
+	Vec2<GLfloat> change = changedPos;
+	changedPos = (0, 0);
+	return change;
 }
 
 
@@ -77,6 +85,7 @@ int Window::Initialize()
 void Window::CreateCallbacks()
 {
 	glfwSetKeyCallback(window, HandleKeys);
+	glfwSetCursorPosCallback(window, HandleMouse);
 }
 
 void Window::HandleKeys(GLFWwindow* window, int key, int code, int action, int mode)
@@ -97,6 +106,23 @@ void Window::HandleKeys(GLFWwindow* window, int key, int code, int action, int m
 			currentWindow->keys[key] = false;
 		}
 	}
+}
+
+void Window::HandleMouse(GLFWwindow* window, double xPos, double yPos)
+{
+	Window* currentWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
+	if (currentWindow->mouseFirstMoved)
+	{
+		currentWindow->lastPos.x = xPos;
+		currentWindow->lastPos.y = yPos;
+		currentWindow->mouseFirstMoved = false;
+	}
+	currentWindow->changedPos.x = xPos - currentWindow->lastPos.x;
+	currentWindow->changedPos.y = currentWindow->lastPos.y - yPos;
+	currentWindow->lastPos.x = xPos;
+	currentWindow->lastPos.y = yPos;
+
+	printf("x: %.6f, y:%.6f \n", currentWindow->changedPos.x, currentWindow->changedPos.y);
 }
 
 Window::~Window()
