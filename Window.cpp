@@ -2,14 +2,19 @@
 
 Window::Window()
 {
-	width = 800;
-	height = 600;
+	initialSize = Vec2<GLint>(800, 600);
+	for (int i = 0; i < 1024; i++) keys[i] = 0;
 }
 
-Window::Window(GLint windowWidth, GLint windowHeight)
+Window::Window(Vec2<GLint> windowSize)
 {
-	width = windowWidth;
-	height = windowHeight;
+	initialSize = windowSize;
+	for (int i = 0; i < 1024; i++) keys[i] = 0;
+}
+Window::Window(GLint windowX, GLint windowY)
+{
+	initialSize = Vec2<GLint>(windowX, windowY);
+	for (int i = 0; i < 1024; i++) keys[i] = 0;
 }
 
 int Window::Initialize()
@@ -27,7 +32,7 @@ int Window::Initialize()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // No backwards compatibility
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // Yes forward compatibility
-	window = glfwCreateWindow(width, height, "Test Window", NULL, NULL);
+	window = glfwCreateWindow(initialSize.x, initialSize.y, "Test Window", NULL, NULL);
 	if (!window)
 	{
 		printf("GLFW can't create window");
@@ -36,13 +41,16 @@ int Window::Initialize()
 	}
 
 	//Get Buffer size information
-	glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight); //read the window and return width and height to our variables
+	glfwGetFramebufferSize(window, &buffer.x, &buffer.y); //read the window and return width and height to our variables
 
 	//Set the context for GLEW to use
 	glfwMakeContextCurrent(window);
 
 	//Allow modern extension features
 	glewExperimental = GL_TRUE;
+
+	//
+	CreateCallbacks();
 
 
 	//Initialize GLEW
@@ -59,8 +67,36 @@ int Window::Initialize()
 	
 
 	//Setup Viewport Size
-	glViewport(0, 0, bufferWidth, bufferHeight);
-	
+	glViewport(0, 0, buffer.x, buffer.y);
+
+	glfwSetWindowUserPointer(window, this);
+}
+
+
+
+void Window::CreateCallbacks()
+{
+	glfwSetKeyCallback(window, HandleKeys);
+}
+
+void Window::HandleKeys(GLFWwindow* window, int key, int code, int action, int mode)
+{
+	Window* currentWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
+	if (key == GLFW_KEY_ESCAPE && GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+	if (key >= 0 && key < 1024)
+	{
+		if (action == GLFW_PRESS)
+		{
+			currentWindow->keys[key] = true;
+		}
+		else if (action == GLFW_RELEASE)
+		{
+			currentWindow->keys[key] = false;
+		}
+	}
 }
 
 Window::~Window()
