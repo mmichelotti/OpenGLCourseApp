@@ -59,7 +59,6 @@ std::vector<GLfloat> vertices = {
 };
 
 
-
 void AddMesh(std::vector<GLfloat>& vertices, std::vector<unsigned int>& indices)
 {
 	meshes.push_back(new Mesh(vertices, indices));
@@ -73,7 +72,7 @@ void CreateShaders()
 }
 int main()
 {
-	mainWindow = Window(1920, 1080);
+	mainWindow = Window(800, 600);
 	mainWindow.Initialize();
 	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), Vec2<GLfloat>(-90.0f, 0.0f), 5.0f, 0.5f);
 
