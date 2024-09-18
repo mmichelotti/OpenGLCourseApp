@@ -22,6 +22,7 @@ public:
 
 	GLuint GetProjectionLocation() { return uniformProjection; }
 	GLuint GetModelLocation() { return uniformModel; }
+	GLuint GetViewLocation() { return uniformView; }
 
 	~Shader();
 
@@ -29,6 +30,7 @@ private:
 	GLuint shaderID;
 	GLuint uniformProjection;
 	GLuint uniformModel;
+	GLuint uniformView;
 	void Compile(const char* vertexCode, const char* fragmentCode);
 	void Add(GLuint program, const char* code, GLenum shaderType);
 };

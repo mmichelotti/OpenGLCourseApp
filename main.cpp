@@ -13,6 +13,7 @@
 #include "Mesh.h"
 #include "Shader.h"
 #include "Window.h"
+#include "Camera.h"
 
 //GL => The actual graphics API
 //GLEW => OpenGL Extensions for additional OpenGL features and extensions, since OpenGL can differ across platforms
@@ -26,7 +27,8 @@ It provides a platform-independent API for windowing and input.
 
 const float toRadians = 3.14159265f / 180.0f; //converting a full circle from 2PI to 360*
 
-
+GLfloat deltaTime = 0.0f;
+GLfloat lastTime = 0.0f;
 
 /*
 An index buffer is mostly identical to a vertex buffer
@@ -36,6 +38,7 @@ th Index Buffer recycle those overlapping vertices, so it has a total of 4
 */
 
 Window mainWindow;
+Camera camera;
 std::vector<Mesh*> meshes;
 std::vector<Shader> shaders;
 
@@ -46,29 +49,29 @@ static const char* vShader = "Shaders/shader.vert";
 //Fragment  Shader
 static const char* fShader = "Shaders/shader.frag";
 
-void CreateObjects() 
+void CreateObjects()
 {
-	//switched from tri to pyramid
-
-	unsigned int indices[] =
-	{
+	unsigned int indices[] = {
 		0, 3, 1,
 		1, 3, 2,
 		2, 3, 0,
 		0, 1, 2
 	};
 
-	GLfloat vertices[] =
-	{
+	GLfloat vertices[] = {
 		-1.0f, -1.0f, 0.0f,
-		 0.0f, -1.0f, 1.0f,
-	     1.0,  -1.0f, 0.0f,
-		 0.0f,  1.0f, 0.0f
+		0.0f, -1.0f, 1.0f,
+		1.0f, -1.0f, 0.0f,
+		0.0f, 1.0f, 0.0f
 	};
-	Mesh* obj = new Mesh();
-	obj->Create(vertices, indices, 12,12);
-	//-> this syntax is like "." the differnece is that since obj is a pointer, this is the syntax to access its public members
-	meshes.push_back(obj);
+
+	Mesh* obj1 = new Mesh();
+	obj1->Create(vertices, indices, 12, 12);
+	meshes.push_back(obj1);
+
+	Mesh* obj2 = new Mesh();
+	obj2->Create(vertices, indices, 12, 12);
+	meshes.push_back(obj2);
 }
 
 void CreateShaders() 
@@ -77,23 +80,35 @@ void CreateShaders()
 	shader1->CreateFromFile(vShader, fShader);
 	shaders.push_back(*shader1);
 }
+void UpdateDeltaTime()
+{
+	GLfloat now = glfwGetTime();
+	deltaTime = now - lastTime;
+	lastTime = now;
+}
 int main()
 {
 	mainWindow = Window(800, 600);
 	mainWindow.Initialize();
-
+	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), Vec2<GLfloat>(-90.0f, 0.0f), 5.0f, 0.5f);
 	CreateObjects();
 	CreateShaders();
 
 	GLuint uniformProjection = 0;
 	GLuint uniformModel = 0;
+	GLuint uniformView = 0;
 
 	glm::mat4 projection = glm::perspective(45.0f, mainWindow.GetAspectRatio(), 0.1f, 100.0f);
 	
 	//Main Loop
 	while (!mainWindow.ShouldClose())
 	{
+
+		UpdateDeltaTime();
 		glfwPollEvents(); //Get and handle user input events
+
+		camera.KeyControl(mainWindow.GetKeys(), deltaTime);
+		camera.MouseControl(mainWindow.GetChange());
 
 		//Clear the whole window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); //Set it to white
@@ -103,11 +118,8 @@ int main()
 		shaders[0].Use();
 		uniformModel = shaders[0].GetModelLocation();
 		uniformProjection = shaders[0].GetProjectionLocation();
+		uniformView = shaders[0].GetViewLocation();
 
-		glm::mat4 model(1.0f); 
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, -5.0f));
-		model = glm::rotate(model, 0 * toRadians, glm::vec3(1.0f, 1.0f, 1.0f));
-		model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
 
 		//Identity Matrix 
 		/*
@@ -127,10 +139,20 @@ int main()
 			if we want them relative we need to apply after
 		*/
 
+		glm::mat4 model(1.0f);
+
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
+		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
-
+		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.ViewMatrix()));
 		meshes[0]->Render();
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 1.0f, -2.5f));
+		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		meshes[1]->Render();
 
 		glUseProgram(0);
 

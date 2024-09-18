@@ -27,4 +27,32 @@ public:
         static_assert(is_arithmetic<T>::value && is_arithmetic<U>::value, "T and U must be arithmetic types");
         return Vec2<T>(x - static_cast<T>(other.x), y - static_cast<T>(other.y));
     }
+
+    // Multiplication operator
+    template<typename U>
+    Vec2<T> operator*(const Vec2<U>& other) const
+    {
+        static_assert(is_arithmetic<T>::value && is_arithmetic<U>::value, "T and U must be arithmetic types");
+        return Vec2<T>(x * static_cast<T>(other.x), y * static_cast<T>(other.y));
+    }
+
+    //Multiplication-assignment operator
+    template<typename U>
+    Vec2<T>& operator*=(U scalar)
+    {
+        static_assert(is_arithmetic<T>::value && is_arithmetic<U>::value, "T and U must be arithmetic types");
+        x *= static_cast<T>(scalar);
+        y *= static_cast<T>(scalar);
+        return *this;
+    }
+
+    //Addition-assignment operator
+    template<typename U>
+    Vec2<T>& operator+=(U scalar)
+    {
+        static_assert(is_arithmetic<T>::value && is_arithmetic<U>::value, "T and U must be arithmetic types");
+        x += static_cast<T>(scalar);
+        y += static_cast<T>(scalar);
+        return *this;
+    }
 };

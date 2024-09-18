@@ -4,17 +4,20 @@
 Window::Window()
 {
 	initialSize = Vec2<GLint>(800, 600);
+	deltaPos = Vec2<GLfloat>(0, 0);
 	for (int i = 0; i < 1024; i++) keys[i] = 0;
 }
 
 Window::Window(Vec2<GLint> windowSize)
 {
 	initialSize = windowSize;
+	deltaPos = Vec2<GLfloat>(0, 0);
 	for (int i = 0; i < 1024; i++) keys[i] = 0;
 }
 Window::Window(GLint windowX, GLint windowY)
 {
 	initialSize = Vec2<GLint>(windowX, windowY);
+	deltaPos = Vec2<GLfloat>(0, 0);
 	for (int i = 0; i < 1024; i++) keys[i] = 0;
 }
 
