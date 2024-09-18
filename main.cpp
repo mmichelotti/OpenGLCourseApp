@@ -51,26 +51,24 @@ static const char* fShader = "Shaders/shader.frag";
 
 void CreateObjects()
 {
-	unsigned int indices[] = {
+	std::vector<unsigned int> indices = {
 		0, 3, 1,
 		1, 3, 2,
 		2, 3, 0,
 		0, 1, 2
 	};
 
-	GLfloat vertices[] = {
+	std::vector<GLfloat> vertices = {
 		-1.0f, -1.0f, 0.0f,
 		0.0f, -1.0f, 1.0f,
 		1.0f, -1.0f, 0.0f,
 		0.0f, 1.0f, 0.0f
 	};
 
-	Mesh* obj1 = new Mesh();
-	obj1->Create(vertices, indices, 12, 12);
+	Mesh* obj1 = new Mesh(vertices, indices);
 	meshes.push_back(obj1);
 
-	Mesh* obj2 = new Mesh();
-	obj2->Create(vertices, indices, 12, 12);
+	Mesh* obj2 = new Mesh(vertices, indices);
 	meshes.push_back(obj2);
 }
 

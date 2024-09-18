@@ -1,4 +1,5 @@
 #include "Mesh.h"
+#include <vector>
 
 /// <summary>
 /// Constructor for class Mesh
@@ -10,8 +11,28 @@ Mesh::Mesh()
 	IBO = 0;
 	indexCount = 0;
 }
-void Mesh::Create(GLfloat* vertices, unsigned int* indices, unsigned int verticesAmount, unsigned int indicesAmount)
+
+Mesh::Mesh(const std::vector<GLfloat>& vertices, std::vector<unsigned int>& indices)
 {
+	VAO = 0;
+	VBO = 0;
+	IBO = 0;
+	indexCount = 0;
+	Create(vertices, indices);
+}
+
+
+//Accessing the arrays by reference
+/*
+	This means that if vertices or indices changes here, they will change even the original passed by arguments
+	Literally like c# ref argument
+	But in this case, adding the keyword const promises that the value of vertices and indices won't change
+	So this all mean that we are READING ONLY a direct reference to an array
+*/
+void Mesh::Create(const std::vector<GLfloat>& vertices, std::vector<unsigned int>& indices)
+{
+	unsigned int verticesAmount = vertices.size();
+	unsigned int indicesAmount = indices.size();
 	indexCount = indicesAmount;
 
 	//generate VAO VBO IBO
@@ -23,8 +44,8 @@ void Mesh::Create(GLfloat* vertices, unsigned int* indices, unsigned int vertice
 	glBindVertexArray(VAO);
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indicesAmount, indices, GL_STATIC_DRAW);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * verticesAmount, vertices, GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indicesAmount, indices.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * verticesAmount, vertices.data(), GL_STATIC_DRAW);
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
 	glEnableVertexAttribArray(0);

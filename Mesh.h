@@ -1,12 +1,13 @@
 #pragma once
 #include <GL/glew.h>
+#include <vector>
 
 class Mesh
 {
 public:
 	Mesh();
+	Mesh(const std::vector<GLfloat>& vertices, std::vector<unsigned int>& indices);
 	
-	void Create(GLfloat *vertices, unsigned int *indices, unsigned int verticesAmount, unsigned int indicesAmount);
 	void Render();
 	void Clear();
 
@@ -17,5 +18,7 @@ private:
 	GLuint VBO; //Vertex Buffer Object
 	GLuint IBO; //Index Buffer Object
 	GLsizei indexCount;
+
+	void Create(const std::vector<GLfloat>& vertices, std::vector<unsigned int>& indices);
 };
 
