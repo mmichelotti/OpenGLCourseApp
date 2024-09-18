@@ -54,6 +54,7 @@ int Window::Initialize()
 	glewExperimental = GL_TRUE;
 
 	// Handle Key and Mouse inputs
+	//?TODO Move these inputs into their own static input class
 	CreateCallbacks();
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
