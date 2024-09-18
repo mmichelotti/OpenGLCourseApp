@@ -27,9 +27,11 @@ It provides a platform-independent API for windowing and input.
 */
 
 const float toRadians = 3.14159265f / 180.0f; //converting a full circle from 2PI to 360*
+//Vertex Shader
+static const char* vShader = "Shaders/shader.vert";
 
-GLfloat deltaTime = 0.0f;
-GLfloat lastTime = 0.0f;
+//Fragment  Shader
+static const char* fShader = "Shaders/shader.frag";
 
 /*
 An index buffer is mostly identical to a vertex buffer
@@ -43,34 +45,25 @@ Camera camera;
 std::vector<Mesh*> meshes;
 std::vector<Shader> shaders;
 
+std::vector<unsigned int> indices = {
+	0, 3, 1,
+	1, 3, 2,
+	2, 3, 0,
+	0, 1, 2
+};
 
-//Vertex Shader
-static const char* vShader = "Shaders/shader.vert";
+std::vector<GLfloat> vertices = {
+	-1.0f, -1.0f, 0.0f,
+	0.0f, -1.0f, 1.0f,
+	1.0f, -1.0f, 0.0f,
+	0.0f, 1.0f, 0.0f
+};
 
-//Fragment  Shader
-static const char* fShader = "Shaders/shader.frag";
 
-void CreateObjects()
+
+void AddMesh(std::vector<GLfloat>& vertices, std::vector<unsigned int>& indices)
 {
-	std::vector<unsigned int> indices = {
-		0, 3, 1,
-		1, 3, 2,
-		2, 3, 0,
-		0, 1, 2
-	};
-
-	std::vector<GLfloat> vertices = {
-		-1.0f, -1.0f, 0.0f,
-		0.0f, -1.0f, 1.0f,
-		1.0f, -1.0f, 0.0f,
-		0.0f, 1.0f, 0.0f
-	};
-
-	Mesh* obj1 = new Mesh(vertices, indices);
-	meshes.push_back(obj1);
-
-	Mesh* obj2 = new Mesh(vertices, indices);
-	meshes.push_back(obj2);
+	meshes.push_back(new Mesh(vertices, indices));
 }
 
 void CreateShaders() 
@@ -79,18 +72,16 @@ void CreateShaders()
 	shader1->CreateFromFile(vShader, fShader);
 	shaders.push_back(*shader1);
 }
-void UpdateDeltaTime()
-{
-	GLfloat now = glfwGetTime();
-	deltaTime = now - lastTime;
-	lastTime = now;
-}
 int main()
 {
 	mainWindow = Window(800, 600);
 	mainWindow.Initialize();
 	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), Vec2<GLfloat>(-90.0f, 0.0f), 5.0f, 0.5f);
-	CreateObjects();
+
+	AddMesh(vertices, indices);
+	AddMesh(vertices, indices);
+	AddMesh(vertices, indices);
+
 	CreateShaders();
 
 	GLuint uniformProjection = 0;
@@ -103,7 +94,6 @@ int main()
 	while (!mainWindow.ShouldClose())
 	{
 		Time::UpdateTime();
-		UpdateDeltaTime();
 		glfwPollEvents(); //Get and handle user input events
 
 		camera.KeyControl(mainWindow.GetKeys());
@@ -152,6 +142,14 @@ int main()
 		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		meshes[1]->Render();
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 2.0f, -2.5f));
+		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		meshes[2]->Render();
+
+
 
 		glUseProgram(0);
 
