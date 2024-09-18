@@ -23,10 +23,12 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="Time.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="Time.h" />
     <ClInclude Include="Vec2.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="Shader.h" />

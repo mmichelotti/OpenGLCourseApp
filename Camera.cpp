@@ -17,9 +17,9 @@ Camera::Camera(vec3 initialPosition, vec3 initialWorldUp, Vec2<GLfloat> initialR
 	Update();
 }
 
-void Camera::KeyControl(bool* keys, GLfloat deltaTime)
+void Camera::KeyControl(bool* keys)
 {
-	GLfloat velocity = moveSpeed * deltaTime;
+	GLfloat velocity = moveSpeed * Time::GetDeltaTime();
 
 	if (keys[GLFW_KEY_W])
 	{

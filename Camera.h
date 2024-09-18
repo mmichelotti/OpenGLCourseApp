@@ -6,6 +6,7 @@
 #include <GLFW/glfw3.h>
 
 #include "Vec2.h"
+#include "Time.h"
 
 using namespace glm;
 
@@ -14,7 +15,7 @@ class Camera
 public:
 	Camera();
 	Camera(vec3 initialPosition, vec3 initialWorldUp, Vec2<GLfloat> initialRotation, GLfloat initialMoveSpeed, GLfloat initialTurnSpeed);
-	void KeyControl(bool* keys, GLfloat deltaTime);
+	void KeyControl(bool* keys);
 	void MouseControl(Vec2<GLfloat> deltaPos);
 	mat4 ViewMatrix();
 	~Camera();

@@ -14,6 +14,7 @@
 #include "Shader.h"
 #include "Window.h"
 #include "Camera.h"
+#include "Time.h"
 
 //GL => The actual graphics API
 //GLEW => OpenGL Extensions for additional OpenGL features and extensions, since OpenGL can differ across platforms
@@ -101,11 +102,11 @@ int main()
 	//Main Loop
 	while (!mainWindow.ShouldClose())
 	{
-
+		Time::UpdateTime();
 		UpdateDeltaTime();
 		glfwPollEvents(); //Get and handle user input events
 
-		camera.KeyControl(mainWindow.GetKeys(), deltaTime);
+		camera.KeyControl(mainWindow.GetKeys());
 		camera.MouseControl(mainWindow.GetChange());
 
 		//Clear the whole window
