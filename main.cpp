@@ -27,10 +27,9 @@ It provides a platform-independent API for windowing and input.
 */
 
 const float toRadians = 3.14159265f / 180.0f; //converting a full circle from 2PI to 360*
-//Vertex Shader
-static const char* vShader = "Shaders/shader.vert";
 
-//Fragment  Shader
+//Vertex and Fragment Shader files
+static const char* vShader = "Shaders/shader.vert";
 static const char* fShader = "Shaders/shader.frag";
 
 /*
@@ -74,7 +73,7 @@ void CreateShaders()
 }
 int main()
 {
-	mainWindow = Window(800, 600);
+	mainWindow = Window(1920, 1080);
 	mainWindow.Initialize();
 	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f), Vec2<GLfloat>(-90.0f, 0.0f), 5.0f, 0.5f);
 
@@ -148,8 +147,6 @@ int main()
 		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		meshes[2]->Render();
-
-
 
 		glUseProgram(0);
 
