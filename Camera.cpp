@@ -1,4 +1,8 @@
 #include "Camera.h"
+#include <unordered_map>
+#include <functional>
+
+using namespace std;
 
 Camera::Camera()
 {
@@ -9,7 +13,7 @@ Camera::Camera(vec3 initialPosition, vec3 initialWorldUp, Vec2<GLfloat> initialR
 	position = initialPosition;
 	worldUp = initialWorldUp;
 	rotation = initialRotation;
-	front = glm::vec3(0.0f, 0.0f, -1.0f);
+	front = vec3(0.0f, 0.0f, -1.0f);
 
 	moveSpeed = initialMoveSpeed;
 	turnSpeed = initialTurnSpeed;
@@ -19,26 +23,21 @@ Camera::Camera(vec3 initialPosition, vec3 initialWorldUp, Vec2<GLfloat> initialR
 
 void Camera::KeyControl(bool* keys)
 {
-	GLfloat velocity = moveSpeed * Time::GetDeltaTime();
-
-	if (keys[GLFW_KEY_W])
+	const unordered_map<int, vec3> movementMap = 
 	{
-		position += front * velocity;
-	}
+		{ GLFW_KEY_W, + front },
+		{ GLFW_KEY_S, - front },
+		{ GLFW_KEY_D, + right },
+		{ GLFW_KEY_A, - right },
+		{ GLFW_KEY_E, + up	  },
+		{ GLFW_KEY_Q, - up	  } 
+	};
 
-	if (keys[GLFW_KEY_S])
-	{
-		position -= front * velocity;
-	}
+	const float deltaVelocity = moveSpeed * Time::Delta;
 
-	if (keys[GLFW_KEY_A])
+	for (const auto& [key, direction] : movementMap)
 	{
-		position -= right * velocity;
-	}
-
-	if (keys[GLFW_KEY_D])
-	{
-		position += right * velocity;
+		if (keys[key]) position += direction * deltaVelocity;
 	}
 }
 

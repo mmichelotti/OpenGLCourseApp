@@ -21,6 +21,7 @@ Window::Window(GLint windowX, GLint windowY)
 	for (int i = 0; i < 1024; i++) keys[i] = 0;
 }
 
+
 int Window::Initialize()
 {
 	//Initialize GLFW 

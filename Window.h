@@ -18,6 +18,7 @@ public:
 	GLfloat GetBufferHeight() { return bufferSize.y; }
 	GLfloat GetAspectRatio() { return bufferSize.x / bufferSize.y; }
 
+
 	Vec2<GLfloat> GetChange();
 
 	bool ShouldClose() { return glfwWindowShouldClose(window); }

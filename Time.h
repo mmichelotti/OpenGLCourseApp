@@ -2,12 +2,11 @@
 static class Time
 {
 public:
-	static float GetTime() { return time; }
-	static float GetDeltaTime() { return deltaTime; }
-	static float GetLastTime() { return lastTime; }
+	static const float& Current;
+	static const float& Delta;
 	static void UpdateTime();
 private:
-	static float time;
-	static float lastTime;
-	static float deltaTime;
+	static float _current;
+	static float _lastTime;
+	static float _deltaTime;
 };
