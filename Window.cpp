@@ -106,14 +106,24 @@ void Window::HandleKeys(GLFWwindow* window, int key, int code, int action, int m
 	}
 }
 
+/*
+void Window::InitializeMouse(GLFWwindow* window, double xPos, double yPos)
+{
+	Window* currentWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
+	currentWindow->lastPos = Vec2<GLint>(xPos, yPos);
+}
+*/
+//! NEED TO CHANGE FIRST MOVE OR SOMETHING 
 void Window::HandleMouse(GLFWwindow* window, double xPos, double yPos)
 {
 	Window* currentWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
+	//(0,0)
 	if (currentWindow->mouseFirstMoved)
 	{
 		currentWindow->lastPos = Vec2<GLint>(xPos, yPos);
 		currentWindow->mouseFirstMoved = false;
 	}
+
 	currentWindow->deltaPos.x = xPos - currentWindow->lastPos.x;
 	currentWindow->deltaPos.y = currentWindow->lastPos.y - yPos;
 	currentWindow->lastPos = Vec2<GLint>(xPos, yPos);
