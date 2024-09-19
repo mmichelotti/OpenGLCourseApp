@@ -1,4 +1,5 @@
 #include "Camera.h"
+#include "World.h"
 #include <unordered_map>
 #include <functional>
 
@@ -8,13 +9,10 @@ Camera::Camera()
 {
 }
 
-Camera::Camera(vec3 initialPosition, vec3 initialWorldUp, Vec2<GLfloat> initialRotation, GLfloat initialMoveSpeed, GLfloat initialTurnSpeed)
+Camera::Camera(vec3 initialPosition, Vec2<GLfloat> initialRotation, GLfloat initialMoveSpeed, GLfloat initialTurnSpeed)
 {
 	position = initialPosition;
-	worldUp = initialWorldUp;
 	rotation = initialRotation;
-	front = vec3(0.0f, 0.0f, -1.0f);
-
 	moveSpeed = initialMoveSpeed;
 	turnSpeed = initialTurnSpeed;
 
@@ -75,7 +73,7 @@ void Camera::Update()
 	front.z = sin(glm::radians(rotation.x)) * cos(glm::radians(rotation.y));
 	front = glm::normalize(front);
 
-	right = glm::normalize(glm::cross(front, worldUp));
+	right = glm::normalize(glm::cross(front, World::Up));
 	up = glm::normalize(glm::cross(right, front));
 }
 

@@ -34,11 +34,11 @@ private:
 	Vec2<GLint> initialSize;
 	Vec2<GLint> bufferSize;
 
-	bool keys[1024];
+	bool keys[1024] = {};
 	bool mouseFirstMoved;
 
 	Vec2<GLfloat> lastPos;
-	Vec2<GLfloat> deltaPos;
+	Vec2<GLfloat> deltaPos = Vec2<GLfloat>(0, 0);
 
 	void CreateCallbacks();
 	static void HandleKeys(GLFWwindow* window, int key, int code, int action, int mode);
