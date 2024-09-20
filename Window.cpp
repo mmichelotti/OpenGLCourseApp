@@ -49,10 +49,13 @@ int Window::Initialize()
 	glewExperimental = GL_TRUE;
 
 	// Handle Key and Mouse inputs
-	//?TODO Move these inputs into their own static input class
 	CreateCallbacks();
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+	//Initialize lastPos
+	double xPos, yPos;
+	glfwGetCursorPos(window, &xPos, &yPos);
+	lastPos = Vec2<GLint>(xPos, yPos);
 
 	//Initialize GLEW
 	if (glewInit() != GLEW_OK)
@@ -64,8 +67,6 @@ int Window::Initialize()
 	}
 
 	glEnable(GL_DEPTH_TEST);
-
-	
 
 	//Setup Viewport Size
 	glViewport(0, 0, bufferSize.x, bufferSize.y);
@@ -106,24 +107,10 @@ void Window::HandleKeys(GLFWwindow* window, int key, int code, int action, int m
 	}
 }
 
-/*
-void Window::InitializeMouse(GLFWwindow* window, double xPos, double yPos)
-{
-	Window* currentWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
-	currentWindow->lastPos = Vec2<GLint>(xPos, yPos);
-}
-*/
 //! NEED TO CHANGE FIRST MOVE OR SOMETHING 
 void Window::HandleMouse(GLFWwindow* window, double xPos, double yPos)
 {
 	Window* currentWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
-	//(0,0)
-	if (currentWindow->mouseFirstMoved)
-	{
-		currentWindow->lastPos = Vec2<GLint>(xPos, yPos);
-		currentWindow->mouseFirstMoved = false;
-	}
-
 	currentWindow->deltaPos.x = xPos - currentWindow->lastPos.x;
 	currentWindow->deltaPos.y = currentWindow->lastPos.y - yPos;
 	currentWindow->lastPos = Vec2<GLint>(xPos, yPos);

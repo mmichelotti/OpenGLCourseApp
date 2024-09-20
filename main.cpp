@@ -17,6 +17,7 @@
 #include "Window.h"
 #include "Camera.h"
 #include "Time.h"
+#include "Texture.h"
 
 //GL => The actual graphics API
 //GLEW => OpenGL Extensions for additional OpenGL features and extensions, since OpenGL can differ across platforms
@@ -46,6 +47,10 @@ Camera camera;
 std::vector<Mesh*> meshes;
 std::vector<Shader> shaders;
 
+
+Texture brickTXT;
+Texture dirtTXT;
+
 std::vector<unsigned int> indices = {
 	0, 3, 1,
 	1, 3, 2,
@@ -53,11 +58,13 @@ std::vector<unsigned int> indices = {
 	0, 1, 2
 };
 
-std::vector<GLfloat> vertices = {
-	-1.0f, -1.0f, 0.0f,
-	0.0f, -1.0f, 1.0f,
-	1.0f, -1.0f, 0.0f,
-	0.0f, 1.0f, 0.0f
+std::vector<GLfloat> vertices = 
+{
+//    x      y     z     u     v
+	-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
+	 0.0f, -1.0f, 1.0f,	0.5f, 0.0f,
+	 1.0f, -1.0f, 0.0f,	1.0f, 0.0f,
+	 0.0f,  1.0f, 0.0f,	0.5f, 1.0f
 };
 
 
@@ -77,6 +84,11 @@ int main()
 	mainWindow = Window(800, 600);
 	mainWindow.Initialize();
 	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), Vec2<GLfloat>(-90.0f, 0.0f), 5.0f, 0.5f);
+
+	brickTXT = Texture("Textures/brick.png");
+	brickTXT.Load();
+	dirtTXT = Texture("Textures/dirt.png");
+	dirtTXT.Load();
 
 	AddMesh(vertices, indices);
 	AddMesh(vertices, indices);
@@ -135,12 +147,14 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.ViewMatrix()));
+		brickTXT.Use();
 		meshes[0]->Render();
 
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, 1.0f, -2.5f));
 		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		dirtTXT.Use();
 		meshes[1]->Render();
 
 		model = glm::mat4(1.0f);

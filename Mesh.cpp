@@ -47,8 +47,22 @@ void Mesh::Create(const std::vector<GLfloat>& vertices, std::vector<unsigned int
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices[0]) * indicesAmount, indices.data(), GL_STATIC_DRAW);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * verticesAmount, vertices.data(), GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+	
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 5, 0);//every 5 elements of the array there is a vertex
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 5, (void*)(sizeof(vertices[0]) * 3));
 	glEnableVertexAttribArray(0);
+	glEnableVertexAttribArray(1);
+	/*
+	    EXPLANATION
+		Argument 1 : Attribute type
+			0 = Actual Position
+			1 = Texture Coordinate (UV)
+		Argument 2 : Length of the array for that attribute
+		Argument 5 : (How many elements in the array in between the each vertex) * size (5 in this case)
+		Argument 6 : How much offset from the starting position of the array
+	*/
+
+
 
 	//Unbind VAO and VBO
 	glBindVertexArray(0);
