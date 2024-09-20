@@ -21,22 +21,20 @@ Camera::Camera(vec3 initialPosition, Vec2<GLfloat> initialRotation, GLfloat init
 
 void Camera::KeyControl(bool* keys)
 {
-	const unordered_map<int, vec3> movementMap = 
-	{
-		{ GLFW_KEY_W, + front },
-		{ GLFW_KEY_S, - front },
-		{ GLFW_KEY_D, + right },
-		{ GLFW_KEY_A, - right },
-		{ GLFW_KEY_E, + up	  },
-		{ GLFW_KEY_Q, - up	  } 
-	};
+	vec3 direction = vec3(0.0f, 0.0f, 0.0f);  // Initialize direction vector
 
+	if (keys[GLFW_KEY_W]) direction += front;
+	if (keys[GLFW_KEY_S]) direction -= front;
+	if (keys[GLFW_KEY_D]) direction += right;
+	if (keys[GLFW_KEY_A]) direction -= right;
+	if (keys[GLFW_KEY_E]) direction += up;
+	if (keys[GLFW_KEY_Q]) direction -= up;
+
+	if (length(direction) > 0) direction = normalize(direction);
+		
 	const float deltaVelocity = moveSpeed * Time::Delta;
 
-	for (const auto& [key, direction] : movementMap)
-	{
-		if (keys[key]) position += direction * deltaVelocity;
-	}
+	position += direction * deltaVelocity;
 }
 
 void Camera::MouseControl(Vec2<GLfloat> deltaPos)
