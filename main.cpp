@@ -108,8 +108,8 @@ int main()
 		Time::UpdateTime();
 		glfwPollEvents(); //Get and handle user input events
 
-		camera.KeyControl(mainWindow.GetKeys());
-		camera.MouseControl(mainWindow.GetChange());
+		camera.KeyControl(mainWindow.GetKeys(), mainWindow.GetScrollOffset());
+		camera.MouseControl(mainWindow.GetMouseDelta());
 
 		//Clear the whole window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); //Set it to white

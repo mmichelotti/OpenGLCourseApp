@@ -17,9 +17,10 @@ public:
 	GLfloat GetBufferWidth() { return bufferSize.x; }
 	GLfloat GetBufferHeight() { return bufferSize.y; }
 	GLfloat GetAspectRatio() { return bufferSize.x / bufferSize.y; }
+	GLfloat GetScrollOffset() { return scrollOffset; }
 
-
-	Vec2<GLfloat> GetChange();
+	Vec2<GLfloat> GetMouseDelta();
+	
 
 	bool ShouldClose() { return glfwWindowShouldClose(window); }
 	bool* GetKeys() { return keys; }
@@ -35,14 +36,15 @@ private:
 	Vec2<GLint> bufferSize;
 
 	bool keys[1024] = {};
-	bool mouseFirstMoved;
+
+	GLfloat scrollOffset = 0;
 
 	Vec2<GLfloat> lastPos;
 	Vec2<GLfloat> deltaPos = Vec2<GLfloat>(0, 0);
 
 	void CreateCallbacks();
 	static void HandleKeys(GLFWwindow* window, int key, int code, int action, int mode);
-	static void InitializeMouse(GLFWwindow* window, double xPos, double yPos);
+	static void HandleScroll(GLFWwindow* window, double xoffset, double yoffset);
 	static void HandleMouse(GLFWwindow* window, double xPos, double yPos);
 };
 

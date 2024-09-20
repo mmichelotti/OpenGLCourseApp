@@ -15,7 +15,7 @@ class Camera
 public:
 	Camera();
 	Camera(vec3 initialPosition, Vec2<GLfloat> initialRotation, GLfloat initialMoveSpeed, GLfloat initialTurnSpeed);
-	void KeyControl(bool* keys);
+	void KeyControl(bool* keys, float offset);
 	void MouseControl(Vec2<GLfloat> deltaPos);
 	
 	mat4 ViewMatrix();

@@ -1,9 +1,5 @@
 #include "Camera.h"
 #include "World.h"
-#include <unordered_map>
-#include <functional>
-
-using namespace std;
 
 Camera::Camera()
 {
@@ -19,9 +15,9 @@ Camera::Camera(vec3 initialPosition, Vec2<GLfloat> initialRotation, GLfloat init
 	Update();
 }
 
-void Camera::KeyControl(bool* keys)
+void Camera::KeyControl(bool* keys, float offset)
 {
-	vec3 direction = vec3(0.0f, 0.0f, 0.0f);  // Initialize direction vector
+	vec3 direction = vec3(0.0f, 0.0f, 0.0f);
 
 	if (keys[GLFW_KEY_W]) direction += front;
 	if (keys[GLFW_KEY_S]) direction -= front;
@@ -31,11 +27,14 @@ void Camera::KeyControl(bool* keys)
 	if (keys[GLFW_KEY_Q]) direction -= up;
 
 	if (length(direction) > 0) direction = normalize(direction);
-		
-	const float deltaVelocity = moveSpeed * Time::Delta;
+
+	const float deltaVelocity = glm::max(0.0f, ((offset + moveSpeed) * Time::Delta));
+	// Properly print the delta velocity with 2 decimal precision
+	printf("Delta velocity: %.2f\n", offset + moveSpeed);
 
 	position += direction * deltaVelocity;
 }
+
 
 void Camera::MouseControl(Vec2<GLfloat> deltaPos)
 {
