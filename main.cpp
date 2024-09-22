@@ -18,6 +18,7 @@
 #include "Camera.h"
 #include "Time.h"
 #include "Texture.h"
+#include "Light.h"
 
 //GL => The actual graphics API
 //GLEW => OpenGL Extensions for additional OpenGL features and extensions, since OpenGL can differ across platforms
@@ -50,6 +51,8 @@ std::vector<Shader> shaders;
 
 Texture brickTXT;
 Texture dirtTXT;
+
+Light mainLight;
 
 std::vector<unsigned int> indices = {
 	0, 3, 1,
@@ -90,6 +93,8 @@ int main()
 	dirtTXT = Texture("Textures/dirt.png");
 	dirtTXT.Load();
 
+	mainLight = Light(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
+
 	AddMesh(vertices, indices);
 	AddMesh(vertices, indices);
 	AddMesh(vertices, indices);
@@ -99,6 +104,8 @@ int main()
 	GLuint uniformProjection = 0;
 	GLuint uniformModel = 0;
 	GLuint uniformView = 0;
+	GLuint uniformAmbientColor = 0;
+	GLuint uniformAmbientIntensity = 0;
 
 	glm::mat4 projection = glm::perspective(45.0f, mainWindow.GetAspectRatio(), 0.1f, 100.0f);
 	
@@ -120,6 +127,10 @@ int main()
 		uniformModel = shaders[0].GetModelLocation();
 		uniformProjection = shaders[0].GetProjectionLocation();
 		uniformView = shaders[0].GetViewLocation();
+		uniformAmbientColor = shaders[0].GetAmbientColorLocation();
+		uniformAmbientIntensity = shaders[0].GetAmbientIntensityLocation();
+
+		mainLight.Use(uniformAmbientIntensity, uniformAmbientColor);
 
 
 		//Identity Matrix 

@@ -98,6 +98,8 @@ void Shader::Compile(const char* vertexCode, const char* fragmentCode)
 	uniformModel = glGetUniformLocation(shaderID, "model");
 	uniformProjection = glGetUniformLocation(shaderID, "projection");
 	uniformView = glGetUniformLocation(shaderID, "view");
+	uniformAmbientColor = glGetUniformLocation(shaderID, "directionalLight.color");
+	uniformAmbientIntensity = glGetUniformLocation(shaderID, "directionalLight.ambientIntensity");
 }
 
 void Shader::Add(GLuint program, const char* code, GLenum shaderType)

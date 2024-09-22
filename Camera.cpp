@@ -29,9 +29,6 @@ void Camera::KeyControl(bool* keys, float offset)
 	if (length(direction) > 0) direction = normalize(direction);
 
 	const float deltaVelocity = glm::max(0.0f, ((offset + moveSpeed) * Time::Delta));
-	// Properly print the delta velocity with 2 decimal precision
-	printf("Delta velocity: %.2f\n", offset + moveSpeed);
-
 	position += direction * deltaVelocity;
 }
 
