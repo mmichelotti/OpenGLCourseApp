@@ -48,15 +48,19 @@ void Mesh::Create(const std::vector<GLfloat>& vertices, std::vector<unsigned int
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * verticesAmount, vertices.data(), GL_STATIC_DRAW);
 
 	
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 5, 0);//every 5 elements of the array there is a vertex
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 5, (void*)(sizeof(vertices[0]) * 3));
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 8, 0);//every 5 elements of the array there is a vertex
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 8, (void*)(sizeof(vertices[0]) * 3));
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(vertices[0]) * 8, (void*)(sizeof(vertices[0]) * 5));
 	glEnableVertexAttribArray(0);
 	glEnableVertexAttribArray(1);
+	glEnableVertexAttribArray(2);
 	/*
 	    EXPLANATION
+		0 / 1 / 2 etc are the layout defined within the vertex shader
 		Argument 1 : Attribute type
 			0 = Actual Position
 			1 = Texture Coordinate (UV)
+			2 = Normal 
 		Argument 2 : Length of the array for that attribute
 		Argument 5 : (How many elements in the array in between the each vertex) * size (5 in this case)
 		Argument 6 : How much offset from the starting position of the array

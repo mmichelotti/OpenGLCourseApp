@@ -63,11 +63,11 @@ std::vector<unsigned int> indices = {
 
 std::vector<GLfloat> vertices = 
 {
-//    x      y     z     u     v
-	-1.0f, -1.0f, 0.0f, 0.0f, 0.0f,
-	 0.0f, -1.0f, 1.0f,	0.5f, 0.0f,
-	 1.0f, -1.0f, 0.0f,	1.0f, 0.0f,
-	 0.0f,  1.0f, 0.0f,	0.5f, 1.0f
+//    x      y     z		 u     v		 r     g     b
+	-1.0f, -1.0f, 0.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
+	 0.0f, -1.0f, 1.0f,		0.5f, 0.0f,		0.0f, 0.0f, 0.0f,
+	 1.0f, -1.0f, 0.0f,		1.0f, 0.0f,		0.0f, 0.0f, 0.0f,
+	 0.0f,  1.0f, 0.0f,		0.5f, 1.0f,		0.0f, 0.0f, 0.0f
 };
 
 
@@ -75,7 +75,53 @@ void AddMesh(std::vector<GLfloat>& vertices, std::vector<unsigned int>& indices)
 {
 	meshes.push_back(new Mesh(vertices, indices));
 }
+void CalculateAverageNormal(std::vector<GLfloat>& vertices, std::vector<unsigned int>& indices, unsigned int vLength, unsigned int normalOffset)
+{
+	for (size_t i = 0; i < indices.size(); i += 3)
+	{
+		unsigned int in0 = indices[i + 0] * vLength;
+		unsigned int in1 = indices[i + 1] * vLength;
+		unsigned int in2 = indices[i + 2] * vLength;
 
+		float v1X = vertices[in1 + 0] - vertices[in0 + 0];
+		float v1Y = vertices[in1 + 1] - vertices[in0 + 1];
+		float v1Z = vertices[in1 + 2] - vertices[in0 + 2];
+
+		float v2X = vertices[in2 + 0] - vertices[in0 + 0];
+		float v2Y = vertices[in2 + 1] - vertices[in0 + 1];
+		float v2Z = vertices[in2 + 2] - vertices[in0 + 2];
+		
+		glm::vec3 v1(v1X, v1Y, v1Z);
+		glm::vec3 v2(v2X,v2Y,v2Z);
+		glm::vec3 normal = glm::cross(v1, v2);
+		normal = glm::normalize(normal);
+
+		in0 += normalOffset;
+		in1 += normalOffset;
+		in2 += normalOffset;
+
+		vertices[in0 + 0] += normal.x;
+		vertices[in0 + 1] += normal.y;
+		vertices[in0 + 2] += normal.z;
+
+		vertices[in1 + 0] += normal.x;
+		vertices[in1 + 1] += normal.y;
+		vertices[in1 + 2] += normal.z;
+
+		vertices[in2 + 0] += normal.x;
+		vertices[in2 + 1] += normal.y;
+		vertices[in2 + 2] += normal.z;
+	}
+	for (size_t i = 0; i < vertices.size() / vLength; i++)
+	{
+		unsigned int nOffset = (i * vLength) + normalOffset;
+		glm::vec3 vec(vertices[nOffset], vertices[nOffset+1], vertices[nOffset+2]);
+		vec = glm::normalize(vec);
+		vertices[nOffset + 0] = vec.x;
+		vertices[nOffset + 1] = vec.y;
+		vertices[nOffset + 2] = vec.z;
+	}
+}
 void CreateShaders() 
 {
 	Shader *shader1 = new Shader();
@@ -93,7 +139,10 @@ int main()
 	dirtTXT = Texture("Textures/dirt.png");
 	dirtTXT.Load();
 
-	mainLight = Light(glm::vec3(1.0f, 1.0f, 1.0f), 1.0f);
+	mainLight = Light(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(2.0f, 1.0f, -2.0f), 1.0f, 1.0f);
+
+
+	CalculateAverageNormal(vertices, indices, 8, 5);
 
 	AddMesh(vertices, indices);
 	AddMesh(vertices, indices);
@@ -106,6 +155,8 @@ int main()
 	GLuint uniformView = 0;
 	GLuint uniformAmbientColor = 0;
 	GLuint uniformAmbientIntensity = 0;
+	GLuint uniformLightDirection = 0;
+	GLuint uniformDiffuseIntensity = 0;
 
 	glm::mat4 projection = glm::perspective(45.0f, mainWindow.GetAspectRatio(), 0.1f, 100.0f);
 	
@@ -124,13 +175,17 @@ int main()
 
 		//Bind shader
 		shaders[0].Use();
+
 		uniformModel = shaders[0].GetModelLocation();
 		uniformProjection = shaders[0].GetProjectionLocation();
 		uniformView = shaders[0].GetViewLocation();
+
 		uniformAmbientColor = shaders[0].GetAmbientColorLocation();
 		uniformAmbientIntensity = shaders[0].GetAmbientIntensityLocation();
+		uniformLightDirection = shaders[0].GetLightDirectionLocation();
+		uniformDiffuseIntensity = shaders[0].GetDiffuseIntensityLocation();
 
-		mainLight.Use(uniformAmbientIntensity, uniformAmbientColor);
+		mainLight.Use(uniformAmbientColor, uniformLightDirection, uniformAmbientIntensity, uniformDiffuseIntensity);
 
 
 		//Identity Matrix 
