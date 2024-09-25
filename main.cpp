@@ -139,7 +139,7 @@ int main()
 	dirtTXT = Texture("Textures/dirt.png");
 	dirtTXT.Load();
 
-	mainLight = Light(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(2.0f, 1.0f, -2.0f), 1.0f, 1.0f);
+	mainLight = Light(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(2.0f, 1.0f, -2.0f), 0.2f, 1.0f);
 
 
 	CalculateAverageNormal(vertices, indices, 8, 5);
