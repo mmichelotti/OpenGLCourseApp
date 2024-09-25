@@ -19,6 +19,7 @@
 #include "Time.h"
 #include "Texture.h"
 #include "Light.h"
+#include "Material.h"
 
 //GL => The actual graphics API
 //GLEW => OpenGL Extensions for additional OpenGL features and extensions, since OpenGL can differ across platforms
@@ -52,6 +53,9 @@ std::vector<Shader> shaders;
 Texture brickTXT;
 Texture dirtTXT;
 
+Material roughMaterial;
+Material dullMaterial;
+
 Light mainLight;
 
 std::vector<unsigned int> indices = {
@@ -63,11 +67,11 @@ std::vector<unsigned int> indices = {
 
 std::vector<GLfloat> vertices = 
 {
-//    x      y     z		 u     v		 r     g     b
-	-1.0f, -1.0f, 0.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-	 0.0f, -1.0f, 1.0f,		0.5f, 0.0f,		0.0f, 0.0f, 0.0f,
-	 1.0f, -1.0f, 0.0f,		1.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-	 0.0f,  1.0f, 0.0f,		0.5f, 1.0f,		0.0f, 0.0f, 0.0f
+//    x      y      z		 u     v		 r     g     b
+	-1.0f, -1.0f, -0.6f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
+	 0.0f, -1.0f,  1.0f,		0.5f, 0.0f,		0.0f, 0.0f, 0.0f,
+	 1.0f, -1.0f, -0.6f,		1.0f, 0.0f,		0.0f, 0.0f, 0.0f,
+	 0.0f,  1.0f,  0.0f,		0.5f, 1.0f,		0.0f, 0.0f, 0.0f
 };
 
 
@@ -130,7 +134,7 @@ void CreateShaders()
 }
 int main()
 {
-	mainWindow = Window(800, 600);
+	mainWindow = Window(1366, 768);
 	mainWindow.Initialize();
 	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), Vec2<GLfloat>(-90.0f, 0.0f), 5.0f, 0.5f);
 
@@ -139,7 +143,10 @@ int main()
 	dirtTXT = Texture("Textures/dirt.png");
 	dirtTXT.Load();
 
-	mainLight = Light(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(2.0f, 1.0f, -2.0f), 0.2f, 1.0f);
+	roughMaterial = Material(1.0f, 32);
+	dullMaterial = Material(0.3f,4);
+
+	mainLight = Light(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(2.0f, 1.0f, -2.0f), 0.3f, 0.2f);
 
 
 	CalculateAverageNormal(vertices, indices, 8, 5);
@@ -153,10 +160,14 @@ int main()
 	GLuint uniformProjection = 0;
 	GLuint uniformModel = 0;
 	GLuint uniformView = 0;
+	GLuint uniformEyePosition = 0;
+
 	GLuint uniformAmbientColor = 0;
 	GLuint uniformAmbientIntensity = 0;
 	GLuint uniformLightDirection = 0;
 	GLuint uniformDiffuseIntensity = 0;
+	GLuint uniformSpecular = 0;
+	GLuint uniformRoughness = 0;
 
 	glm::mat4 projection = glm::perspective(45.0f, mainWindow.GetAspectRatio(), 0.1f, 100.0f);
 	
@@ -184,6 +195,9 @@ int main()
 		uniformAmbientIntensity = shaders[0].GetAmbientIntensityLocation();
 		uniformLightDirection = shaders[0].GetLightDirectionLocation();
 		uniformDiffuseIntensity = shaders[0].GetDiffuseIntensityLocation();
+		uniformEyePosition = shaders[0].GetEyePositionLocation();
+		uniformSpecular = shaders[0].GetSpecularLocation();
+		uniformRoughness = shaders[0].GetRoughnessLocation();
 
 		mainLight.Use(uniformAmbientColor, uniformLightDirection, uniformAmbientIntensity, uniformDiffuseIntensity);
 
@@ -206,26 +220,27 @@ int main()
 			if we want them relative we need to apply after
 		*/
 
+		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
+		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.ViewMatrix()));
+		glUniform3f(uniformEyePosition, camera.GetCameraPosition().x, camera.GetCameraPosition().y, camera.GetCameraPosition().z);
 		glm::mat4 model(1.0f);
 
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
-		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.ViewMatrix()));
 		brickTXT.Use();
+		roughMaterial.Use(uniformSpecular, uniformRoughness);
 		meshes[0]->Render();
 
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 1.0f, -2.5f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
+		model = glm::translate(model, glm::vec3(0.0f, 4.0f, -2.5f));
+	
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		dirtTXT.Use();
+		dullMaterial.Use(uniformSpecular, uniformRoughness);
 		meshes[1]->Render();
 
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 2.0f, -2.5f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 1.0f));
+		model = glm::translate(model, glm::vec3(0.0f, 8.0f, -2.5f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		meshes[2]->Render();
 

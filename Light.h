@@ -5,8 +5,8 @@ class Light
 {
 public:
 	Light();
-	Light(glm::vec3 color, glm::vec3 direction, GLfloat aIntensity, GLfloat dIntensity);
-	void Use(GLfloat colorLocation, GLfloat directionLocation, GLfloat aIntensityLocation, GLfloat dIntensityLocation);
+	Light(glm::vec3 color, glm::vec3 direction, GLfloat dIntensity, GLfloat aIntensity);
+	void Use(GLuint colorLocation, GLuint directionLocation, GLuint aIntensityLocation, GLuint dIntensityLocation);
 
 private:
 	glm::vec3 color;

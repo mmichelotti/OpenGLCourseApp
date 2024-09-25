@@ -9,7 +9,7 @@ Light::Light()
 	diffuseIntensity = 0.0f;
 }
 
-Light::Light(glm::vec3 color, glm::vec3 direction, GLfloat aIntensity, GLfloat dIntensity)
+Light::Light(glm::vec3 color, glm::vec3 direction, GLfloat dIntensity, GLfloat aIntensity)
 {
 	this->color = color;
 	this->direction = direction;
@@ -17,7 +17,7 @@ Light::Light(glm::vec3 color, glm::vec3 direction, GLfloat aIntensity, GLfloat d
 	this->diffuseIntensity = dIntensity;
 }
 
-void Light::Use(GLfloat colorLocation, GLfloat directionLocation, GLfloat aIntensityLocation, GLfloat dIntensityLocation)
+void Light::Use(GLuint colorLocation, GLuint directionLocation, GLuint aIntensityLocation, GLuint dIntensityLocation)
 {
 	//Bind the color from the .shader to the cpp information
 	glUniform3f(colorLocation, color.x, color.y, color.z);
