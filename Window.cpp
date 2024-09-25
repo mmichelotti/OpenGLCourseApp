@@ -80,7 +80,12 @@ Vec2<GLfloat> Window::GetMouseDelta()
 	deltaPos = (0, 0);
 	return change;
 }
-
+GLfloat Window::GetScrollOffset()
+{
+	GLfloat currentOffset = scrollOffset;
+	scrollOffset = 0; 
+	return currentOffset;
+}
 void Window::CreateCallbacks()
 {
 	glfwSetKeyCallback(window, HandleKeys);
@@ -110,18 +115,10 @@ void Window::HandleKeys(GLFWwindow* window, int key, int code, int action, int m
 
 void Window::HandleScroll(GLFWwindow* window, double xoffset, double yoffset)
 {
-	// xoffset: scroll left or right (on some devices with horizontal scrolling)
-	// yoffset: scroll up or down (positive for up, negative for down)
 	Window* currentWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
-	if (yoffset > 0)
-	{
-		currentWindow->scrollOffset += 10.0f;
-	}
-	else if (yoffset < 0)
-	{
-		currentWindow->scrollOffset -= 10.0f;
-	}
+	currentWindow->scrollOffset = static_cast<GLfloat>(yoffset); // Either +1, -1, or 0
 }
+
 
 //! NEED TO CHANGE FIRST MOVE OR SOMETHING 
 void Window::HandleMouse(GLFWwindow* window, double xPos, double yPos)

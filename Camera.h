@@ -15,10 +15,12 @@ class Camera
 public:
 	Camera();
 	Camera(vec3 initialPosition, Vec2<GLfloat> initialRotation, GLfloat initialMoveSpeed, GLfloat initialTurnSpeed);
-	void KeyControl(bool* keys, float offset);
+	void KeyControl(bool* keys, float scrollOffset);
 	void MouseControl(Vec2<GLfloat> deltaPos);
 	
 	mat4 ViewMatrix();
+
+	glm::vec3 GetCameraPosition() { return position; }
 	~Camera();
 private:
 

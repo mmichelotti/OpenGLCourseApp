@@ -15,7 +15,7 @@ Camera::Camera(vec3 initialPosition, Vec2<GLfloat> initialRotation, GLfloat init
 	Update();
 }
 
-void Camera::KeyControl(bool* keys, float offset)
+void Camera::KeyControl(bool* keys, float scrollOffset)
 {
 	vec3 direction = vec3(0.0f, 0.0f, 0.0f);
 
@@ -28,9 +28,13 @@ void Camera::KeyControl(bool* keys, float offset)
 
 	if (length(direction) > 0) direction = normalize(direction);
 
-	const float deltaVelocity = glm::max(0.0f, ((offset + moveSpeed) * Time::Delta));
+	moveSpeed += scrollOffset;
+	moveSpeed = glm::max(0.1f, moveSpeed);
+	const float deltaVelocity = moveSpeed * Time::Delta;
+
 	position += direction * deltaVelocity;
 }
+
 
 
 void Camera::MouseControl(Vec2<GLfloat> deltaPos)
