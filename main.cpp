@@ -18,7 +18,7 @@
 #include "Camera.h"
 #include "Time.h"
 #include "Texture.h"
-#include "Light.h"
+#include "DirectionalLight.h"
 #include "Material.h"
 
 //GL => The actual graphics API
@@ -56,7 +56,7 @@ Texture dirtTXT;
 Material roughMaterial;
 Material dullMaterial;
 
-Light mainLight;
+DirectionalLight mainLight;
 
 std::vector<unsigned int> indices = {
 	0, 3, 1,
@@ -146,7 +146,7 @@ int main()
 	roughMaterial = Material(1.0f, 32);
 	dullMaterial = Material(0.3f,4);
 
-	mainLight = Light(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(2.0f, 1.0f, -2.0f), 0.3f, 0.2f);
+	mainLight = DirectionalLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(2.0f, 1.0f, -2.0f), 0.3f, 0.2f);
 
 
 	CalculateAverageNormal(vertices, indices, 8, 5);
