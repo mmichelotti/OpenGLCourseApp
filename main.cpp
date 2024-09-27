@@ -61,14 +61,15 @@ Material dullMaterial;
 DirectionalLight mainLight;
 PointLight pointLights[MAX_POINT_LIGHTS];
 
-std::vector<unsigned int> indices = {
+std::vector<unsigned int> pyramidIndices = 
+{
 	0, 3, 1,
 	1, 3, 2,
 	2, 3, 0,
 	0, 1, 2
 };
 
-std::vector<GLfloat> vertices = 
+std::vector<GLfloat> pyramidVertices = 
 {
 //    x      y      z		 u     v		 r     g     b
 	-1.0f, -1.0f, -0.6f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
@@ -77,6 +78,20 @@ std::vector<GLfloat> vertices =
 	 0.0f,  1.0f,  0.0f,		0.5f, 1.0f,		0.0f, 0.0f, 0.0f
 };
 
+
+std::vector<unsigned int> floorIndices = 
+{
+	0, 2, 1,
+	1, 2, 3
+};
+
+std::vector<GLfloat> floorVertices = 
+{
+	-10.0f, 0.0f, -10.0f,	0.0f, 0.0f,		0.0f, -1.0f, 0.0f,
+	10.0f, 0.0f, -10.0f,	10.0f, 0.0f,	0.0f, -1.0f, 0.0f,
+	-10.0f, 0.0f, 10.0f,	0.0f, 10.0f,	0.0f, -1.0f, 0.0f,
+	10.0f, 0.0f, 10.0f,		10.0f, 10.0f,	0.0f, -1.0f, 0.0f
+};
 
 void AddMesh(std::vector<GLfloat>& vertices, std::vector<unsigned int>& indices)
 {
@@ -107,17 +122,17 @@ void CalculateAverageNormal(std::vector<GLfloat>& vertices, std::vector<unsigned
 		in1 += normalOffset;
 		in2 += normalOffset;
 
-		vertices[in0 + 0] += normal.x;
-		vertices[in0 + 1] += normal.y;
-		vertices[in0 + 2] += normal.z;
+		pyramidVertices[in0 + 0] += normal.x;
+		pyramidVertices[in0 + 1] += normal.y;
+		pyramidVertices[in0 + 2] += normal.z;
 
-		vertices[in1 + 0] += normal.x;
-		vertices[in1 + 1] += normal.y;
-		vertices[in1 + 2] += normal.z;
+		pyramidVertices[in1 + 0] += normal.x;
+		pyramidVertices[in1 + 1] += normal.y;
+		pyramidVertices[in1 + 2] += normal.z;
 
-		vertices[in2 + 0] += normal.x;
-		vertices[in2 + 1] += normal.y;
-		vertices[in2 + 2] += normal.z;
+		pyramidVertices[in2 + 0] += normal.x;
+		pyramidVertices[in2 + 1] += normal.y;
+		pyramidVertices[in2 + 2] += normal.z;
 	}
 	for (size_t i = 0; i < vertices.size() / vLength; i++)
 	{
@@ -149,17 +164,18 @@ int main()
 	roughMaterial = Material(1.0f, 32);
 	dullMaterial = Material(0.3f,4);
 
-	mainLight = DirectionalLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(2.0f, 1.0f, -2.0f), 0.3f, 0.2f);
+	mainLight = DirectionalLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(2.0f, 1.0f, -2.0f), 0.3f, 0.1f);
 	unsigned int pointLightCount = 0;
-	pointLights[0] = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), 1.0f, 0.1f, glm::vec3(-4.0f, 0.0f, 0.0f), 0.3f, 0.2f, 0.1f);
+	pointLights[0] = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), 0.4f, 0.1f, glm::vec3(-4.0f, 0.0f, 0.0f), 0.3f, 0.2f, 0.1f);
+	pointLightCount++;
+	pointLights[1] = PointLight(glm::vec3(0.0f, 0.0f, 1.0f), 0.4f, 0.1f, glm::vec3(4.0f, 0.0f, 0.0f), 0.3f, 0.2f, 0.1f);
 	pointLightCount++;
 
 
-	CalculateAverageNormal(vertices, indices, 8, 5);
+	CalculateAverageNormal(pyramidVertices, pyramidIndices, 8, 5);
 
-	AddMesh(vertices, indices);
-	AddMesh(vertices, indices);
-	AddMesh(vertices, indices);
+	AddMesh(pyramidVertices, pyramidIndices);
+	AddMesh(floorVertices, floorIndices);
 
 	CreateShaders();
 
@@ -222,8 +238,10 @@ int main()
 		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
 		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.ViewMatrix()));
 		glUniform3f(uniformEyePosition, camera.GetCameraPosition().x, camera.GetCameraPosition().y, camera.GetCameraPosition().z);
+
 		glm::mat4 model(1.0f);
 
+		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		brickTXT.Use();
@@ -231,17 +249,11 @@ int main()
 		meshes[0]->Render();
 
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 4.0f, -2.5f));
-	
+		model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		dirtTXT.Use();
-		dullMaterial.Use(uniformSpecular, uniformRoughness);
+		roughMaterial.Use(uniformSpecular, uniformRoughness);
 		meshes[1]->Render();
-
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 8.0f, -2.5f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		meshes[2]->Render();
 
 		glUseProgram(0);
 
