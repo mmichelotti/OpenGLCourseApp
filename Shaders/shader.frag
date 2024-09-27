@@ -1,5 +1,6 @@
 #version 330		
 
+const int MAX_POINT_LIGHTS = 3;
 // Taking input from the .vert	
 // Preparing out to read from the cpp
 in vec4 VertexColor;	
@@ -8,13 +9,17 @@ in vec3 Normal;
 in vec3 FragPos;
 out vec4 Color;	
 
+struct Light
+{
+    vec3 color;
+    float ambientIntensity;
+    float diffuseIntensity;
+};
 // Usually ambient is given by GI but for semplicity im sticking with the classic hard coded
 struct DirectionalLight
 {
-    vec3 color;
+    Light base;
     vec3 direction;
-    float ambientIntensity;
-    float diffuseIntensity;
 };
 struct Material
 {
@@ -31,14 +36,14 @@ void main()
 {	
     //texture() glsl method to sample a texture
     vec4 texture = texture(theTexture, TexCoord);
-    vec3 ambientColor = directionalLight.color * directionalLight.ambientIntensity;
+    vec3 ambientColor = directionalLight.base.color * directionalLight.base.ambientIntensity;
     float diffuseFactor = max(dot(normalize(Normal), normalize(directionalLight.direction)), 0.0f);
     // A.B = |A||B| * cos(angle)
     // The length of A and B is normalized so
     // A.B = cos(angle)
     // So the dot is giving the cos(angle)
     // Since when it reaches 0 is already at maximum "darkness" we clamp so it doesnt go up to -1
-    vec3 diffuseColor = directionalLight.color * directionalLight.diffuseIntensity * diffuseFactor;
+    vec3 diffuseColor = directionalLight.base.color * directionalLight.base.diffuseIntensity * diffuseFactor;
     
     vec3 specularColor = vec3(0.0f,0.0f,0.0f);
     //refactor if with max
@@ -52,7 +57,7 @@ void main()
         if(specularFactor > 0.0f)
         {
             specularFactor = pow(specularFactor, material.roughness);
-            specularColor = directionalLight.color * material.specular * specularFactor;
+            specularColor = directionalLight.base.color * material.specular * specularFactor;
         }
     }
     

@@ -2,6 +2,7 @@
 #include "Light.h"
 class PointLight : Light
 {
+public:
 	PointLight();
 	PointLight(glm::vec3 color, GLfloat dIntensity, GLfloat aIntensity, glm::vec3 position, GLfloat constant, GLfloat linear, GLfloat exponent);
 	void Use(GLuint colorLocation, GLuint positionLocation, GLuint aIntensityLocation, GLuint dIntensityLocation, GLuint constLocation, GLuint linLocation, GLuint expLocation);

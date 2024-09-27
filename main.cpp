@@ -162,10 +162,6 @@ int main()
 	GLuint uniformView = 0;
 	GLuint uniformEyePosition = 0;
 
-	GLuint uniformAmbientColor = 0;
-	GLuint uniformAmbientIntensity = 0;
-	GLuint uniformLightDirection = 0;
-	GLuint uniformDiffuseIntensity = 0;
 	GLuint uniformSpecular = 0;
 	GLuint uniformRoughness = 0;
 
