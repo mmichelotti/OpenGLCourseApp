@@ -6,6 +6,10 @@ Shader::Shader()
 	uniformModel = 0;
 	uniformProjection = 0;
 }
+void Shader::SetDirectionalLight(DirectionalLight* dirLight)
+{
+	dirLight->Use(uniformDirectionalLight.color, uniformDirectionalLight.lightDirection, uniformDirectionalLight.ambientIntensity, uniformDirectionalLight.diffuseIntensity);
+}
 Shader::~Shader()
 {
 	Clear();

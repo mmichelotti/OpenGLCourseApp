@@ -33,6 +33,9 @@ public:
 	GLuint GetRoughnessLocation() { return uniformRoughness; }
 
 
+	void SetDirectionalLight(DirectionalLight* dirLight);
+
+
 
 	~Shader();
 
