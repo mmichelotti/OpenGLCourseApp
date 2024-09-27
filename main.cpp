@@ -20,6 +20,8 @@
 #include "Texture.h"
 #include "DirectionalLight.h"
 #include "Material.h"
+#include "CommonValues.h"
+#include "PointLight.h"
 
 //GL => The actual graphics API
 //GLEW => OpenGL Extensions for additional OpenGL features and extensions, since OpenGL can differ across platforms
@@ -57,6 +59,7 @@ Material roughMaterial;
 Material dullMaterial;
 
 DirectionalLight mainLight;
+PointLight pointLights[MAX_POINT_LIGHTS];
 
 std::vector<unsigned int> indices = {
 	0, 3, 1,
@@ -147,6 +150,9 @@ int main()
 	dullMaterial = Material(0.3f,4);
 
 	mainLight = DirectionalLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(2.0f, 1.0f, -2.0f), 0.3f, 0.2f);
+	unsigned int pointLightCount = 0;
+	pointLights[0] = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), 1.0f, 0.1f, glm::vec3(-4.0f, 0.0f, 0.0f), 0.3f, 0.2f, 0.1f);
+	pointLightCount++;
 
 
 	CalculateAverageNormal(vertices, indices, 8, 5);
@@ -192,6 +198,7 @@ int main()
 		uniformRoughness = shaders[0].GetRoughnessLocation();
 
 		shaders[0].SetDirectionalLight(&mainLight);
+		shaders[0].SetPointLights(pointLights, pointLightCount);
 
 
 		//Identity Matrix 
