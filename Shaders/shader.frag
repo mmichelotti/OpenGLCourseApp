@@ -73,10 +73,30 @@ vec4 CalculateLightByDirection(Light light, vec3 direction)
     }
     return vec4(ambientColor + diffuseColor + specularColor, 1.0f);
 }
-vec4 GetDirectionalLight(){return CalculateLightByDirection(directionalLight.base, directionalLight.direction);}
+vec4 PointLightColor()
+{
+    vec4 totalColor = vec4(0.0f, 0.0f, 0.0f, 0.0f);
+    for(int i = 0; i < pointLightCount; i++)
+    {
+        vec3 difference = FragPos - pointLights[i].position;
+        vec3 direction = normalize(difference);
+        //ax^2 + bx + c
+        float a = pointLights[i].exponent;
+        float x = length(difference);
+        float b = pointLights[i].linear;
+        float c = pointLights[i].constant;
+        float attenuation = (a*x*x) + (b*x) + (c);
+
+        vec4 lightColor = CalculateLightByDirection(pointLights[i].base, direction);
+        totalColor += (lightColor/attenuation);
+    };
+    return totalColor;
+};
+vec4 DirectionalLightColor(){return CalculateLightByDirection(directionalLight.base, directionalLight.direction);}
 void main()			
 {	
     //texture() glsl method to sample a texture
     vec4 texture = texture(theTexture, TexCoord);
-    Color = texture * GetDirectionalLight();
+    vec4 sceneLightsColor = DirectionalLightColor() + PointLightColor();
+    Color = texture * sceneLightsColor;
 }
