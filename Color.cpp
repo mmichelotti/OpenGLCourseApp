@@ -2,11 +2,11 @@
 #include <iostream>
 #include <algorithm> 
 
-const Color Color::red = Color(1.0f, 0.0f, 0.0f, 1.0f);
-const Color Color::green = Color(0.0f, 1.0f, 0.0f, 1.0f);
-const Color Color::blue = Color(0.0f, 0.0f, 1.0f, 1.0f);
-const Color Color::white = Color(1.0f, 1.0f, 1.0f, 1.0f);
-const Color Color::black = Color(0.0f, 0.0f, 0.0f, 1.0f);
+const Color Color::Red = Color(1.0f, 0.0f, 0.0f, 1.0f);
+const Color Color::Green = Color(0.0f, 1.0f, 0.0f, 1.0f);
+const Color Color::Blue = Color(0.0f, 0.0f, 1.0f, 1.0f);
+const Color Color::White = Color(1.0f, 1.0f, 1.0f, 1.0f);
+const Color Color::Black = Color(0.0f, 0.0f, 0.0f, 1.0f);
 
 Color::Color() :
     r(0.0f),

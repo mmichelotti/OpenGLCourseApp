@@ -6,7 +6,7 @@ PointLight::PointLight() : Light()
 	linear = 0.0f;
 	exponent = 0.0f;
 }
-PointLight::PointLight(Color color, GLfloat dIntensity, GLfloat aIntensity, glm::vec3 position, GLfloat constant, GLfloat linear, GLfloat exponent)
+PointLight::PointLight(Color color, glm::vec3 position, GLfloat dIntensity, GLfloat aIntensity,  GLfloat constant, GLfloat linear, GLfloat exponent)
 	: Light(color, dIntensity, aIntensity)
 {
 	this->position = position;

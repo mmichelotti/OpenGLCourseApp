@@ -3,7 +3,7 @@
 
 Light::Light()
 {
-	color = Color::white;
+	color = Color::White;
 
 	ambientIntensity = 1.0f;
 	diffuseIntensity = 0.0f;
