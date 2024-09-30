@@ -164,11 +164,11 @@ int main()
 	roughMaterial = Material(1.0f, 32);
 	dullMaterial = Material(0.3f,4);
 
-	mainLight = DirectionalLight(glm::vec3(1.0f, 1.0f, 1.0f), glm::vec3(2.0f, 1.0f, -2.0f), 0.3f, 0.1f);
+	mainLight = DirectionalLight(Color::white, glm::vec3(2.0f, 1.0f, -2.0f), 0.3f, 0.1f);
 	unsigned int pointLightCount = 0;
-	pointLights[0] = PointLight(glm::vec3(0.0f, 1.0f, 0.0f), 0.4f, 0.1f, glm::vec3(-4.0f, 0.0f, 0.0f), 0.3f, 0.2f, 0.1f);
+	pointLights[0] = PointLight(Color::green, 0.4f, 0.1f, glm::vec3(-4.0f, 0.0f, 0.0f), 0.3f, 0.2f, 0.1f);
 	pointLightCount++;
-	pointLights[1] = PointLight(glm::vec3(0.0f, 0.0f, 1.0f), 0.4f, 0.1f, glm::vec3(4.0f, 0.0f, 0.0f), 0.3f, 0.2f, 0.1f);
+	pointLights[1] = PointLight(Color::blue, 0.4f, 0.1f, glm::vec3(4.0f, 0.0f, 0.0f), 0.3f, 0.2f, 0.1f);
 	pointLightCount++;
 
 

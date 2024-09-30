@@ -1,14 +1,15 @@
 #pragma once
 #include <GLM/glm.hpp>
 #include <GL/glew.h>
+#include "Color.h"
 class Light
 {
 public:
 	Light();
-	Light(glm::vec3 color, GLfloat dIntensity, GLfloat aIntensity);
+	Light(Color color, GLfloat dIntensity, GLfloat aIntensity);
 
 protected:
-	glm::vec3 color;
+	Color color;
 	GLfloat ambientIntensity;
 	GLfloat diffuseIntensity;
 };
