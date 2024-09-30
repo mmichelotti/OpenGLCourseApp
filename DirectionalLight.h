@@ -1,12 +1,13 @@
 #pragma once
 #include "Light.h"
-class DirectionalLight : public Light
+class DirectionalLight
 {
 public:
 	DirectionalLight();
-	DirectionalLight(Color color, glm::vec3 direction, GLfloat dIntensity, GLfloat aIntensity);
+	DirectionalLight(Light light, glm::vec3 direction);
 	void Use(GLuint colorLocation, GLuint directionLocation, GLuint aIntensityLocation, GLuint dIntensityLocation);
 private:
+	Light light;
 	glm::vec3 direction;
 };
 

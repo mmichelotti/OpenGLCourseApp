@@ -9,7 +9,6 @@ public:
 	Light(Color color, GLfloat dIntensity, GLfloat aIntensity);
 	void Use(GLuint colorLocation, GLuint dIntensityLocation, GLuint aIntensityLocation);
 
-protected:
 	Color color;
 	GLfloat ambientIntensity;
 	GLfloat diffuseIntensity;

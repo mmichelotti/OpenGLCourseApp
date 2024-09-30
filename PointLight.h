@@ -1,12 +1,13 @@
 #pragma once
 #include "Light.h"
-class PointLight : Light
+class PointLight
 {
 public:
 	PointLight();
-	PointLight(Color color, glm::vec3 position, GLfloat dIntensity, GLfloat aIntensity, GLfloat constant, GLfloat linear, GLfloat exponent);
+	PointLight(Light light, glm::vec3 position, GLfloat constant, GLfloat linear, GLfloat exponent);
 	void Use(GLuint colorLocation, GLuint positionLocation, GLuint aIntensityLocation, GLuint dIntensityLocation, GLuint constLocation, GLuint linLocation, GLuint expLocation);
-private:
+	
+	Light light;
 	glm::vec3 position;
 	// Attenuation obtained by Color / by quadratic equation (ax^2 + bx + c)
 	GLfloat constant;
