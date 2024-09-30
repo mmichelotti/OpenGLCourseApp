@@ -12,9 +12,6 @@ DirectionalLight::DirectionalLight(Color color, glm::vec3 direction, GLfloat dIn
 
 void DirectionalLight::Use(GLuint colorLocation, GLuint directionLocation, GLuint aIntensityLocation, GLuint dIntensityLocation)
 {
-	//Bind the color from the .shader to the cpp information
-	glUniform3f(colorLocation, color.r, color.g, color.b);
+	Light::Use(colorLocation, dIntensityLocation, aIntensityLocation);
 	glUniform3f(directionLocation, direction.x, direction.y, direction.z);
-	glUniform1f(aIntensityLocation, ambientIntensity);
-	glUniform1f(dIntensityLocation, diffuseIntensity);
 }

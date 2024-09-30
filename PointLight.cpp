@@ -16,11 +16,8 @@ PointLight::PointLight(Color color, glm::vec3 position, GLfloat dIntensity, GLfl
 }
 void PointLight::Use(GLuint colorLocation, GLuint positionLocation, GLuint aIntensityLocation, GLuint dIntensityLocation, GLuint constLocation, GLuint linLocation, GLuint expLocation)
 {
-	//Bind the color from the .shader to the cpp information
-	glUniform3f(colorLocation, color.r, color.g, color.b);
+	Light::Use(colorLocation, dIntensityLocation, aIntensityLocation);
 	glUniform3f(positionLocation, position.x, position.y, position.z);
-	glUniform1f(aIntensityLocation, ambientIntensity);
-	glUniform1f(dIntensityLocation, diffuseIntensity);
 	glUniform1f(constLocation, constant);
 	glUniform1f(linLocation, linear);
 	glUniform1f(expLocation, exponent);
