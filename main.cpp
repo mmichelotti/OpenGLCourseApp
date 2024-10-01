@@ -169,7 +169,7 @@ int main()
 	dullMaterial = Material(0.3f,4);
 
 
-	mainLight = DirectionalLight(Light(Color::White, 0.0f, 0.0f), glm::vec3(2.0f, 1.0f, -2.0f));
+	mainLight = DirectionalLight(Light(Color::White, 0.4f, 0.1f), glm::vec3(2.0f, 1.0f, -2.0f));
 	PointLight pLight1 = PointLight(Light(Color::Red, 0.4f, 0.1f), glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
 	PointLight pLight2 = PointLight(Light(Color::Blue, 0.4f, 0.1f), glm::vec3(2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
 
@@ -178,7 +178,6 @@ int main()
 
 	CalculateAverageNormal(pyramidVertices, pyramidIndices, 8, 5);
 
-	AddMesh(pyramidVertices, pyramidIndices);
 	AddMesh(pyramidVertices, pyramidIndices);
 	AddMesh(floorVertices, floorIndices);
 
@@ -254,18 +253,11 @@ int main()
 		meshes[0]->Render();
 
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		brickTXT.Use();
-		dullMaterial.Use(uniformSpecular, uniformRoughness);
-		meshes[1]->Render();
-
-		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		blankTXT.Use();
-		roughMaterial.Use(uniformSpecular, uniformRoughness);
-		meshes[2]->Render();
+		dullMaterial.Use(uniformSpecular, uniformRoughness);
+		meshes[1]->Render();
 
 		glUseProgram(0);
 
