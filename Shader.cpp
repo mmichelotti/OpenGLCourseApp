@@ -1,4 +1,5 @@
 #include "Shader.h"
+#include <GLM/glm.hpp>
 
 Shader::Shader()
 {
@@ -12,13 +13,15 @@ void Shader::SetDirectionalLight(DirectionalLight* dirLight)
 {
 	dirLight->Use(uniformDirectionalLight.color, uniformDirectionalLight.direction, uniformDirectionalLight.ambientIntensity, uniformDirectionalLight.diffuseIntensity);
 }
-void Shader::SetPointLights(PointLight* pLight, unsigned int lightCount)
+void Shader::SetPointLights(std::vector<PointLight>* pLight)
 {
-	if (lightCount > MAX_POINT_LIGHTS) lightCount = MAX_POINT_LIGHTS;
+	unsigned int lightCount = glm::min(pLight->size(), MAX_POINT_LIGHTS);
+
 	glUniform1i(uniformPointLightCount, lightCount);
+
 	for (size_t i = 0; i < lightCount; i++)
 	{
-		pLight[i].Use(uniformPointLight[i].color, uniformPointLight[i].position, uniformPointLight[i].ambientIntensity, uniformPointLight[i].diffuseIntensity, uniformPointLight[i].constant, uniformPointLight[i].linear, uniformPointLight[i].exponent);
+		pLight->at(i).Use(uniformPointLight[i].color, uniformPointLight[i].position, uniformPointLight[i].ambientIntensity, uniformPointLight[i].diffuseIntensity, uniformPointLight[i].constant, uniformPointLight[i].linear, uniformPointLight[i].exponent);
 	}
 }
 Shader::~Shader()

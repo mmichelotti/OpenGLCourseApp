@@ -4,6 +4,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
+#include <vector>
 
 #include <GL\glew.h>
 #include "DirectionalLight.h"
@@ -36,8 +37,7 @@ public:
 
 
 	void SetDirectionalLight(DirectionalLight* dirLight);
-	//move lights in separate struct or using vectors to not pass the count around
-	void SetPointLights(PointLight* pointLights, unsigned int lightCount);
+	void SetPointLights(std::vector<PointLight>* pLight);
 
 
 

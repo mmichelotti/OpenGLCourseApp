@@ -59,7 +59,7 @@ Material roughMaterial;
 Material dullMaterial;
 
 DirectionalLight mainLight;
-PointLight pointLights[MAX_POINT_LIGHTS];
+std::vector<PointLight> pointLights;
 
 std::vector<unsigned int> pyramidIndices = 
 {
@@ -72,10 +72,10 @@ std::vector<unsigned int> pyramidIndices =
 std::vector<GLfloat> pyramidVertices = 
 {
 //    x      y      z		 u     v		 r     g     b
-	-1.0f, -1.0f, -0.6f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-	 0.0f, -1.0f,  1.0f,		0.5f, 0.0f,		0.0f, 0.0f, 0.0f,
-	 1.0f, -1.0f, -0.6f,		1.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-	 0.0f,  1.0f,  0.0f,		0.5f, 1.0f,		0.0f, 0.0f, 0.0f
+	-1.0f, -1.0f, -0.6f,	0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
+	 0.0f, -1.0f,  1.0f,	0.5f, 0.0f,		0.0f, 0.0f, 0.0f,
+	 1.0f, -1.0f, -0.6f,	1.0f, 0.0f,		0.0f, 0.0f, 0.0f,
+	 0.0f,  1.0f,  0.0f,	0.5f, 1.0f,		0.0f, 0.0f, 0.0f
 };
 
 
@@ -152,6 +152,7 @@ void CreateShaders()
 }
 int main()
 {
+
 	mainWindow = Window(1366, 768);
 	mainWindow.Initialize();
 	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), Vec2<GLfloat>(-90.0f, 0.0f), 5.0f, 0.5f);
@@ -166,12 +167,11 @@ int main()
 
 
 	mainLight = DirectionalLight(Light(Color::White, 0.3f, 0.1f), glm::vec3(2.0f, 1.0f, -2.0f));
-	unsigned int pointLightCount = 0;
-	pointLights[0] = PointLight(Light(Color::Red, 0.4f, 0.1f), glm::vec3(-4.0f, 0.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
-	pointLightCount++;
-	pointLights[1] = PointLight(Light(Color::Blue, 0.4f, 0.1f), glm::vec3(4.0f, 0.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
-	pointLightCount++;
+	PointLight pLight1 = PointLight(Light(Color::Red, 0.4f, 0.1f), glm::vec3(-4.0f, 0.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
+	PointLight pLight2 = PointLight(Light(Color::Blue, 0.4f, 0.1f), glm::vec3(4.0f, 0.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
 
+	pointLights.emplace_back(pLight1);
+	pointLights.emplace_back(pLight2);
 
 	CalculateAverageNormal(pyramidVertices, pyramidIndices, 8, 5);
 
@@ -215,7 +215,7 @@ int main()
 		uniformRoughness = shaders[0].GetRoughnessLocation();
 
 		shaders[0].SetDirectionalLight(&mainLight);
-		shaders[0].SetPointLights(pointLights, pointLightCount);
+		shaders[0].SetPointLights(&pointLights);
 
 
 		//Identity Matrix 
