@@ -54,6 +54,7 @@ std::vector<Shader> shaders;
 
 Texture brickTXT;
 Texture dirtTXT;
+Texture blankTXT;
 
 Material roughMaterial;
 Material dullMaterial;
@@ -155,26 +156,29 @@ int main()
 
 	mainWindow = Window(1366, 768);
 	mainWindow.Initialize();
-	camera = Camera(glm::vec3(0.0f, 0.0f, 0.0f), Vec2<GLfloat>(-90.0f, 0.0f), 5.0f, 0.5f);
+	camera = Camera(glm::vec3(0.0f, 4.0f, 4.0f), Vec2<GLfloat>(-90.0f, -45.0f), 5.0f, 0.5f);
 
 	brickTXT = Texture("Textures/brick.png");
 	brickTXT.Load();
 	dirtTXT = Texture("Textures/dirt.png");
 	dirtTXT.Load();
+	blankTXT = Texture("Textures/plain.png");
+	blankTXT.Load();
 
-	roughMaterial = Material(1.0f, 32);
+	roughMaterial = Material(1.0f, 512);
 	dullMaterial = Material(0.3f,4);
 
 
-	mainLight = DirectionalLight(Light(Color::White, 0.3f, 0.1f), glm::vec3(2.0f, 1.0f, -2.0f));
-	PointLight pLight1 = PointLight(Light(Color::Red, 0.4f, 0.1f), glm::vec3(-4.0f, 0.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
-	PointLight pLight2 = PointLight(Light(Color::Blue, 0.4f, 0.1f), glm::vec3(4.0f, 0.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
+	mainLight = DirectionalLight(Light(Color::White, 0.0f, 0.0f), glm::vec3(2.0f, 1.0f, -2.0f));
+	PointLight pLight1 = PointLight(Light(Color::Red, 0.4f, 0.1f), glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
+	PointLight pLight2 = PointLight(Light(Color::Blue, 0.4f, 0.1f), glm::vec3(2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
 
 	pointLights.emplace_back(pLight1);
 	pointLights.emplace_back(pLight2);
 
 	CalculateAverageNormal(pyramidVertices, pyramidIndices, 8, 5);
 
+	AddMesh(pyramidVertices, pyramidIndices);
 	AddMesh(pyramidVertices, pyramidIndices);
 	AddMesh(floorVertices, floorIndices);
 
@@ -243,18 +247,25 @@ int main()
 		glm::mat4 model(1.0f);
 
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, -2.5f));
+		model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		brickTXT.Use();
-		roughMaterial.Use(uniformSpecular, uniformRoughness);
+		dullMaterial.Use(uniformSpecular, uniformRoughness);
 		meshes[0]->Render();
 
 		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, -2.0f, 0.0f));
+		model = glm::translate(model, glm::vec3(0.0f, 4.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		dirtTXT.Use();
-		roughMaterial.Use(uniformSpecular, uniformRoughness);
+		brickTXT.Use();
+		dullMaterial.Use(uniformSpecular, uniformRoughness);
 		meshes[1]->Render();
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		blankTXT.Use();
+		roughMaterial.Use(uniformSpecular, uniformRoughness);
+		meshes[2]->Render();
 
 		glUseProgram(0);
 
