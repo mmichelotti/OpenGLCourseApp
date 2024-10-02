@@ -261,7 +261,7 @@ int main()
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		dirtTXT.Use();
-		dullMaterial.Use(uniformSpecular, uniformRoughness);
+		roughMaterial.Use(uniformSpecular, uniformRoughness);
 		meshes[1]->Render();
 
 		glUseProgram(0);

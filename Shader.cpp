@@ -6,9 +6,6 @@ Shader::Shader()
 	shaderID = 0;
 	uniformModel = 0;
 	uniformProjection = 0;
-
-	pointLightCount = 0;
-	spotLightCount = 0;
 }
 void Shader::SetDirectionalLight(DirectionalLight* dirLight)
 {
@@ -18,7 +15,7 @@ void Shader::SetPointLights(std::vector<PointLight>* pLight)
 {
 	unsigned int lightCount = glm::min(pLight->size(), MAX_POINT_LIGHTS);
 
-	glUniform1i(uniformPointLightCount, lightCount);
+	glUniform1i(uniformPointLight->count, lightCount);
 
 	for (size_t i = 0; i < lightCount; i++)
 	{
@@ -38,7 +35,7 @@ void Shader::SetSpotLights(std::vector<SpotLight>* sLights)
 {
 	unsigned int lightCount = glm::min(sLights->size(), MAX_SPOT_LIGHTS);
 
-	glUniform1i(uniformSpotLightCount, lightCount);
+	glUniform1i(uniformSpotLight->count, lightCount);
 
 	for (size_t i = 0; i < lightCount; i++)
 	{
@@ -155,10 +152,10 @@ void Shader::Compile(const char* vertexCode, const char* fragmentCode)
 	uniformDirectionalLight.base.diffuseIntensity = glGetUniformLocation(shaderID, "directionalLight.base.diffuseIntensity");
 	uniformDirectionalLight.direction = glGetUniformLocation(shaderID, "directionalLight.direction");
 
-	uniformSpecular = glGetUniformLocation(shaderID, "material.specular");
-	uniformRoughness = glGetUniformLocation(shaderID, "material.roughness");
+	uniformMaterial.specular = glGetUniformLocation(shaderID, "material.specular");
+	uniformMaterial.roughness = glGetUniformLocation(shaderID, "material.roughness");
 
-	uniformPointLightCount = glGetUniformLocation(shaderID, "pointLightCount");
+	uniformPointLight->count = glGetUniformLocation(shaderID, "pointLightCount");
 	for (size_t i = 0; i < MAX_POINT_LIGHTS; i++)
 	{
 		char locBuff[100] = {'\0'};
@@ -185,7 +182,7 @@ void Shader::Compile(const char* vertexCode, const char* fragmentCode)
 		uniformPointLight[i].attenuation.exponent = glGetUniformLocation(shaderID, locBuff);
 	}
 
-	uniformSpotLightCount = glGetUniformLocation(shaderID, "spotLightCount");
+	uniformSpotLight->count = glGetUniformLocation(shaderID, "spotLightCount");
 	for (size_t i = 0; i < MAX_SPOT_LIGHTS; i++)
 	{
 		char locBuff[100] = { '\0' };

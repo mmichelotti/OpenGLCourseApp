@@ -20,11 +20,7 @@ public:
 
 	void CreateFromString(const char* vertexCode, const char* fragmentCode);
 	void CreateFromFile(const char* vertexLocation, const char* fragmentLocation);
-
 	std::string ReadFile(const char* fileLocation);
-
-	void Use();
-	void Clear();
 
 	GLuint GetProjectionLocation() { return uniformProjection; }
 	GLuint GetModelLocation() { return uniformModel; }
@@ -34,21 +30,19 @@ public:
 	GLuint GetAmbientIntensityLocation() { return uniformDirectionalLight.base.ambientIntensity; }
 	GLuint GetDiffuseIntensityLocation() { return uniformDirectionalLight.base.diffuseIntensity; }
 	GLuint GetLightDirectionLocation() { return uniformDirectionalLight.direction; }
-	GLuint GetSpecularLocation() { return uniformSpecular; }
-	GLuint GetRoughnessLocation() { return uniformRoughness; }
+	GLuint GetSpecularLocation() { return uniformMaterial.specular; }
+	GLuint GetRoughnessLocation() { return uniformMaterial.roughness; }
 
-
+	void Use();
+	void Clear();
 	void SetDirectionalLight(DirectionalLight* dirLight);
 	void SetPointLights(std::vector<PointLight>* pLight);
 	void SetSpotLights(std::vector<SpotLight>* sLights);
 
 
-
 	~Shader();
 
 private:
-	int pointLightCount;
-	int spotLightCount;
 
 	GLuint shaderID;
 	GLuint uniformProjection;
@@ -57,32 +51,30 @@ private:
 	GLuint uniformEyePosition;
 
 
-	GLuint uniformSpecular;
-	GLuint uniformRoughness;
+	struct
+	{
+		GLuint specular;
+		GLuint roughness;
+	} uniformMaterial;
 
-	//TODO base struct containing color, ambient, diffuse
-	
 	struct
 	{
 		LightInfo<GLuint> base;
 		GLuint direction;
 	} uniformDirectionalLight;
 
-	GLuint uniformPointLightCount;
-
 	struct
 	{
+		GLuint count;
 		GLuint position;
 		LightInfo<GLuint> base;
 		Quadratic<GLuint> attenuation;
 
-
-
 	} uniformPointLight[MAX_POINT_LIGHTS];
 
-	GLuint uniformSpotLightCount;
 	struct
 	{
+		GLuint count;
 		LightInfo<GLuint> base;
 		Quadratic<GLuint> attenuation;
 		GLuint position;
