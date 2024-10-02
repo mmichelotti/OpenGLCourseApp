@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <GL\glew.h>
+#include "LightInfo.h"
 #include "DirectionalLight.h"
 #include "PointLight.h"
 #include "SpotLight.h"
@@ -29,9 +30,9 @@ public:
 	GLuint GetModelLocation() { return uniformModel; }
 	GLuint GetViewLocation() { return uniformView; }
 	GLuint GetEyePositionLocation() { return uniformEyePosition; }
-	GLuint GetAmbientColorLocation() { return uniformDirectionalLight.color; }
-	GLuint GetAmbientIntensityLocation() { return uniformDirectionalLight.ambientIntensity; }
-	GLuint GetDiffuseIntensityLocation() { return uniformDirectionalLight.diffuseIntensity; }
+	GLuint GetAmbientColorLocation() { return uniformDirectionalLight.base.color; }
+	GLuint GetAmbientIntensityLocation() { return uniformDirectionalLight.base.ambientIntensity; }
+	GLuint GetDiffuseIntensityLocation() { return uniformDirectionalLight.base.diffuseIntensity; }
 	GLuint GetLightDirectionLocation() { return uniformDirectionalLight.direction; }
 	GLuint GetSpecularLocation() { return uniformSpecular; }
 	GLuint GetRoughnessLocation() { return uniformRoughness; }
@@ -60,12 +61,10 @@ private:
 	GLuint uniformRoughness;
 
 	//TODO base struct containing color, ambient, diffuse
+	
 	struct
 	{
-		GLuint color;
-		GLuint ambientIntensity;
-		GLuint diffuseIntensity;
-
+		LightInfo<GLuint> base;
 		GLuint direction;
 	} uniformDirectionalLight;
 
@@ -73,33 +72,22 @@ private:
 
 	struct
 	{
-		GLuint color;
-		GLuint ambientIntensity;
-		GLuint diffuseIntensity;
-
 		GLuint position;
+		LightInfo<GLuint> base;
+		Quadratic<GLuint> attenuation;
 
-		GLuint constant;
-		GLuint linear;
-		GLuint exponent;
+
 
 	} uniformPointLight[MAX_POINT_LIGHTS];
 
 	GLuint uniformSpotLightCount;
 	struct
 	{
-		GLuint color;
-		GLuint ambientIntensity;
-		GLuint diffuseIntensity;
-
+		LightInfo<GLuint> base;
+		Quadratic<GLuint> attenuation;
 		GLuint position;
-
-		GLuint constant;
-		GLuint linear;
-		GLuint exponent;
-
 		GLuint direction;
-		GLuint edge;
+		GLuint radius;
 	} uniformSpotLight[MAX_SPOT_LIGHTS];
 
 	void Compile(const char* vertexCode, const char* fragmentCode);

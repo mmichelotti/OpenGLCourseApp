@@ -2,7 +2,7 @@
 PointLight::PointLight() : 
 	light(), position(glm::vec3(0.0f, 0.0f, 0.0f)), attenuation() {}
 
-PointLight::PointLight(Light light, glm::vec3 position, Quadratic attenuation)
+PointLight::PointLight(Light light, glm::vec3 position, Quadratic<GLfloat> attenuation)
 	: light(light), position(position), attenuation(attenuation) {}
 
 void PointLight::Use(GLuint colorLocation, GLuint positionLocation, GLuint aIntensityLocation, GLuint dIntensityLocation, GLuint constLocation, GLuint linLocation, GLuint expLocation)

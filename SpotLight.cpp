@@ -1,19 +1,18 @@
 #include "SpotLight.h"
 
-SpotLight::SpotLight() : PointLight(), direction(glm::vec3(0.0f, -1.0f, 0.0f)), edge(0.0f) 
+SpotLight::SpotLight() : PointLight(), direction(glm::vec3(0.0f, -1.0f, 0.0f)), radius(0.0f) 
 {
-	procEdge = cosf(glm::radians(edge));
+	processedRadius = cosf(glm::radians(radius));
 }
 
-SpotLight::SpotLight(Light light, glm::vec3 position, Quadratic attenuation, glm::vec3 direction, GLfloat edge) 
-	: PointLight(light, position, attenuation), edge(edge)
+SpotLight::SpotLight(Light light, glm::vec3 position, Quadratic<GLfloat> attenuation, glm::vec3 direction, GLfloat radius)
+	: PointLight(light, position, attenuation), radius(radius)
 {
-	 
 	this->direction = glm::normalize(direction);
-	procEdge = cosf(glm::radians(edge));
+	processedRadius = cosf(glm::radians(radius));
 }
 
-void SpotLight::Use(GLuint colorLocation, GLuint positionLocation, GLuint aIntensityLocation, GLuint dIntensityLocation, GLuint constLocation, GLuint linLocation, GLuint expLocation, GLuint direcitonLocation, GLuint edgeLocation)
+void SpotLight::Use(GLuint colorLocation, GLuint positionLocation, GLuint aIntensityLocation, GLuint dIntensityLocation, GLuint constLocation, GLuint linLocation, GLuint expLocation, GLuint direcitonLocation, GLuint radiusLocation)
 {
 	light.Use(colorLocation, dIntensityLocation, aIntensityLocation);
 
@@ -23,11 +22,11 @@ void SpotLight::Use(GLuint colorLocation, GLuint positionLocation, GLuint aInten
 	glUniform1f(expLocation, attenuation.exponent);
 
 	glUniform3f(direcitonLocation, direction.x, direction.y, direction.z);
-	glUniform1f(edgeLocation,procEdge);
+	glUniform1f(radiusLocation, processedRadius);
 
 }
 
-void SpotLight::SetFlash(glm::vec3 position, glm::vec3 direction)
+void SpotLight::SetPositionAndDirection(glm::vec3 position, glm::vec3 direction)
 {
 	this->position = position;
 	this->direction = direction;

@@ -220,7 +220,7 @@ int main()
 		uniformSpecular = shaders[0].GetSpecularLocation();
 		uniformRoughness = shaders[0].GetRoughnessLocation();
 
-		spotLights.at(0).SetFlash(camera.GetCameraPosition(), camera.GetCameraDirection());
+		spotLights.at(0).SetPositionAndDirection(camera.GetCameraPosition(), camera.GetCameraDirection());
 		//shaders[0].SetDirectionalLight(&mainLight);
 		shaders[0].SetPointLights(&pointLights);
 		shaders[0].SetSpotLights(&spotLights);
