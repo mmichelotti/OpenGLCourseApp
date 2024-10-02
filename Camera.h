@@ -18,6 +18,7 @@ public:
 	void KeyControl(bool* keys, float scrollOffset);
 	void MouseControl(Vec2<GLfloat> deltaPos);
 	
+	vec3 GetCameraDirection(){ return normalize(front); }
 	mat4 ViewMatrix();
 
 	glm::vec3 GetCameraPosition() { return position; }

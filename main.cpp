@@ -22,6 +22,7 @@
 #include "Material.h"
 #include "CommonValues.h"
 #include "PointLight.h"
+#include "SpotLight.h"
 
 //GL => The actual graphics API
 //GLEW => OpenGL Extensions for additional OpenGL features and extensions, since OpenGL can differ across platforms
@@ -36,8 +37,8 @@ It provides a platform-independent API for windowing and input.
 const float toRadians = 3.14159265f / 180.0f; //converting a full circle from 2PI to 360*
 
 //Vertex and Fragment Shader files
-static const char* vShader = "Shaders/shader.vert";
-static const char* fShader = "Shaders/shader.frag";
+static const char* vShader = "Shaders/main.vert";
+static const char* fShader = "Shaders/main.frag";
 
 /*
 An index buffer is mostly identical to a vertex buffer
@@ -61,6 +62,7 @@ Material dullMaterial;
 
 DirectionalLight mainLight;
 std::vector<PointLight> pointLights;
+std::vector<SpotLight> spotLights;
 
 std::vector<unsigned int> pyramidIndices = 
 {
@@ -168,13 +170,14 @@ int main()
 	roughMaterial = Material(1.0f, 512);
 	dullMaterial = Material(0.3f,4);
 
-
-	mainLight = DirectionalLight(Light(Color::White, 0.4f, 0.1f), glm::vec3(2.0f, 1.0f, -2.0f));
+	Light generic = Light(Color::Blue, 1.0f, 1.0f);
+	mainLight = DirectionalLight(Light(Color::White, 0.1f, 0.1f), glm::vec3(2.0f, 1.0f, -2.0f));
 	PointLight pLight1 = PointLight(Light(Color::Red, 0.4f, 0.1f), glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
-	PointLight pLight2 = PointLight(Light(Color::Blue, 0.4f, 0.1f), glm::vec3(2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
-
+	PointLight pLight2 = PointLight(Light(Color::Green, 0.4f, 0.1f), glm::vec3(2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
 	pointLights.emplace_back(pLight1);
 	pointLights.emplace_back(pLight2);
+	SpotLight sLight1 = SpotLight(generic, glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f), glm::vec3(0.0f, -1.0f, 0.0f), 20.0f);
+	spotLights.emplace_back(sLight1);
 
 	CalculateAverageNormal(pyramidVertices, pyramidIndices, 8, 5);
 
@@ -217,8 +220,10 @@ int main()
 		uniformSpecular = shaders[0].GetSpecularLocation();
 		uniformRoughness = shaders[0].GetRoughnessLocation();
 
-		shaders[0].SetDirectionalLight(&mainLight);
+		spotLights.at(0).SetFlash(camera.GetCameraPosition(), camera.GetCameraDirection());
+		//shaders[0].SetDirectionalLight(&mainLight);
 		shaders[0].SetPointLights(&pointLights);
+		shaders[0].SetSpotLights(&spotLights);
 
 
 		//Identity Matrix 
@@ -255,7 +260,7 @@ int main()
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		blankTXT.Use();
+		dirtTXT.Use();
 		dullMaterial.Use(uniformSpecular, uniformRoughness);
 		meshes[1]->Render();
 

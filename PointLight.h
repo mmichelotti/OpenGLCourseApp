@@ -18,7 +18,7 @@ public:
 	PointLight();
 	PointLight(Light light, glm::vec3 position, Quadratic attenuation);
 	void Use(GLuint colorLocation, GLuint positionLocation, GLuint aIntensityLocation, GLuint dIntensityLocation, GLuint constLocation, GLuint linLocation, GLuint expLocation);
-	
+protected:
 	Light light;
 	glm::vec3 position;
 	Quadratic attenuation;
