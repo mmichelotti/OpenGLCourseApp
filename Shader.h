@@ -57,25 +57,31 @@ private:
 		GLuint roughness;
 	} uniformMaterial;
 
+	struct UniformLight
+	{
+		GLuint color;
+		GLuint ambientIntensity;
+		GLuint diffuseIntensity;
+	};
 	struct
 	{
-		LightInfo<GLuint> base;
+		UniformLight base;
 		GLuint direction;
 	} uniformDirectionalLight;
 
 	struct
 	{
+		UniformLight base;
 		GLuint count;
 		GLuint position;
-		LightInfo<GLuint> base;
 		Quadratic<GLuint> attenuation;
 
 	} uniformPointLight[MAX_POINT_LIGHTS];
 
 	struct
 	{
+		UniformLight base;
 		GLuint count;
-		LightInfo<GLuint> base;
 		Quadratic<GLuint> attenuation;
 		GLuint position;
 		GLuint direction;

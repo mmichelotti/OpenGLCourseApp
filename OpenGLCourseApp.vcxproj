@@ -39,7 +39,6 @@
     <ClInclude Include="Color.h" />
     <ClInclude Include="DirectionalLight.h" />
     <ClInclude Include="Light.h" />
-    <ClInclude Include="LightInfo.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="Quadratic.h" />

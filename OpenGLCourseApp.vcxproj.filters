@@ -104,9 +104,6 @@
     <ClInclude Include="SpotLight.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="LightInfo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Quadratic.h">
       <Filter>Header Files</Filter>
     </ClInclude>

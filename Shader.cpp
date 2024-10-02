@@ -60,7 +60,6 @@ Shader::~Shader()
 void Shader::CreateFromString(const char* vertexCode, const char* fragmentCode)
 {
 	Compile(vertexCode, fragmentCode);
-
 }
 
 void Shader::CreateFromFile(const char* vertexLocation, const char* fragmentLocation)
