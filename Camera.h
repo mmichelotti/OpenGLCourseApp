@@ -14,7 +14,7 @@ class Camera
 {
 public:
 	Camera();
-	Camera(vec3 initialPosition, Vec2<GLfloat> initialRotation, GLfloat initialMoveSpeed, GLfloat initialTurnSpeed);
+	Camera(vec3 initialPosition, Vec2<GLfloat> initialRotation);
 	void KeyControl(bool* keys, float scrollOffset);
 	void MouseControl(Vec2<GLfloat> deltaPos);
 	
@@ -23,8 +23,8 @@ public:
 
 	glm::vec3 GetCameraPosition() { return position; }
 	~Camera();
+	
 private:
-
 	vec3 position;
 
 	vec3 up;
@@ -33,8 +33,8 @@ private:
 
 	Vec2<GLfloat> rotation;
 
-	GLfloat moveSpeed;
-	GLfloat turnSpeed;
+	GLfloat moveSpeed = 5.0f;
+	GLfloat turnSpeed = 0.5f;
 
 	void Update();
 };

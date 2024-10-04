@@ -158,7 +158,7 @@ int main()
 
 	mainWindow = Window(1366, 768);
 	mainWindow.Initialize();
-	camera = Camera(glm::vec3(0.0f, 4.0f, 4.0f), Vec2<GLfloat>(-90.0f, -45.0f), 5.0f, 0.5f);
+	camera = Camera(glm::vec3(0.0f, 4.0f, 4.0f), Vec2<GLfloat>(-90.0f, -45.0f));
 
 	brickTXT = Texture("Textures/brick.png");
 	brickTXT.Load();
@@ -202,7 +202,7 @@ int main()
 		Time::UpdateTime();
 		glfwPollEvents(); //Get and handle user input events
 
-		camera.KeyControl(mainWindow.GetKeys(), mainWindow.GetScrollOffset());
+		camera.KeyControl(mainWindow.GetKeys(), mainWindow.GetScrollDelta());
 		camera.MouseControl(mainWindow.GetMouseDelta());
 
 		//Clear the whole window

@@ -1,21 +1,17 @@
 #include "Camera.h"
 #include "World.h"
 
-Camera::Camera()
+Camera::Camera() : position(vec3(0.0f, 0.0f, 0.0f)), rotation(Vec2<GLfloat>(0.0f, 0.0f))
 {
-}
-
-Camera::Camera(vec3 initialPosition, Vec2<GLfloat> initialRotation, GLfloat initialMoveSpeed, GLfloat initialTurnSpeed)
-{
-	position = initialPosition;
-	rotation = initialRotation;
-	moveSpeed = initialMoveSpeed;
-	turnSpeed = initialTurnSpeed;
-
 	Update();
 }
 
-void Camera::KeyControl(bool* keys, float scrollOffset)
+Camera::Camera(vec3 initialPosition, Vec2<GLfloat> initialRotation) : position(initialPosition), rotation(initialRotation)
+{
+	Update();
+}
+
+void Camera::KeyControl(bool* keys, float scrollDelta)
 {
 	vec3 direction = vec3(0.0f, 0.0f, 0.0f);
 
@@ -28,7 +24,7 @@ void Camera::KeyControl(bool* keys, float scrollOffset)
 
 	if (length(direction) > 0) direction = normalize(direction);
 
-	moveSpeed += scrollOffset;
+	moveSpeed += scrollDelta;
 	moveSpeed = glm::max(0.1f, moveSpeed);
 	const float deltaVelocity = moveSpeed * Time::Delta;
 

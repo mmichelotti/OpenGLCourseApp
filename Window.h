@@ -14,11 +14,9 @@ public:
 
 	int Initialize();
 
-	GLfloat GetBufferWidth() { return bufferSize.x; }
-	GLfloat GetBufferHeight() { return bufferSize.y; }
-	GLfloat GetAspectRatio() { return (GLfloat)bufferSize.x / bufferSize.y; }
+	GLfloat GetAspectRatio() { return (GLfloat)bufferSize.x / (GLfloat)bufferSize.y; }
 
-	GLfloat GetScrollOffset();
+	GLfloat GetScrollDelta();
 	Vec2<GLfloat> GetMouseDelta();
 	
 

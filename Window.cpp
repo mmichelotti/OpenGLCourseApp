@@ -1,5 +1,4 @@
 #include "Window.h"
-#include <stdio.h>
 
 Window::Window()
 {
@@ -80,7 +79,7 @@ Vec2<GLfloat> Window::GetMouseDelta()
 	deltaPos = (0, 0);
 	return change;
 }
-GLfloat Window::GetScrollOffset()
+GLfloat Window::GetScrollDelta()
 {
 	GLfloat currentOffset = scrollOffset;
 	scrollOffset = 0; 
