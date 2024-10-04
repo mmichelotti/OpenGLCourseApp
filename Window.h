@@ -14,6 +14,7 @@ public:
 
 	GLint GetBufferWidth() { return bufferWidth; }
 	GLint GetBufferHeight() { return bufferHeight; }
+	GLfloat GetAspectRatio() { return (GLfloat)bufferWidth / (GLfloat)bufferHeight; }
 
 	GLfloat GetScrollOffset();
 	Vec2<GLfloat> GetMouseDelta();
@@ -33,11 +34,9 @@ private:
 
 	bool keys[1024] = {};
 
-	GLfloat lastX, lastY;
 	GLfloat scrollOffset = 0;
 
-
-	Vec2<GLfloat> lastPos;
+	Vec2<GLfloat> lastPos = Vec2<GLfloat>(0, 0);
 	Vec2<GLfloat> deltaPos = Vec2<GLfloat>(0, 0);
 
 
