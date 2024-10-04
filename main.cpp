@@ -156,8 +156,8 @@ void CreateShaders()
 int main()
 {
 
-	mainWindow = Window(1366, 768);
-	mainWindow.Initialize();
+	mainWindow = Window(1920, 1080);
+	mainWindow.Initialise();
 	camera = Camera(glm::vec3(0.0f, 4.0f, 4.0f), Vec2<GLfloat>(-90.0f, -45.0f), 5.0f, 0.5f);
 
 	brickTXT = Texture("Textures/brick.png");
@@ -194,7 +194,7 @@ int main()
 	GLuint uniformSpecular = 0;
 	GLuint uniformRoughness = 0;
 
-	glm::mat4 projection = glm::perspective(45.0f, mainWindow.GetAspectRatio(), 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.GetBufferWidth() / mainWindow.GetBufferHeight(), 0.1f, 100.0f);
 	
 	//Main Loop
 	while (!mainWindow.ShouldClose())
@@ -203,7 +203,7 @@ int main()
 		glfwPollEvents(); //Get and handle user input events
 
 		camera.KeyControl(mainWindow.GetKeys(), mainWindow.GetScrollOffset());
-		camera.MouseControl(mainWindow.GetMouseDelta());
+		camera.MouseControl(Vec2<GLfloat>(mainWindow.getXChange(), mainWindow.getYChange()));
 
 		//Clear the whole window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); //Set it to white

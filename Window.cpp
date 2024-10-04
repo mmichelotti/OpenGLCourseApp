@@ -3,20 +3,34 @@
 
 Window::Window()
 {
-	initialSize = Vec2<GLint>(800, 600);
+	width = 800;
+	height = 600;
+
+	for (size_t i = 0; i < 1024; i++)
+	{
+		keys[i] = 0;
+	}
+
+	xChange = 0.0f;
+	yChange = 0.0f;
 }
 
-Window::Window(Vec2<GLint> windowSize)
+Window::Window(GLint windowWidth, GLint windowHeight)
 {
-	initialSize = windowSize;
-}
-Window::Window(GLint windowX, GLint windowY)
-{
-	initialSize = Vec2<GLint>(windowX, windowY);
+	width = windowWidth;
+	height = windowHeight;
+
+	for (size_t i = 0; i < 1024; i++)
+	{
+		keys[i] = 0;
+	}
+
+	xChange = 0.0f;
+	yChange = 0.0f;
 }
 
 
-int Window::Initialize()
+int Window::Initialise()
 {
 	//Initialize GLFW 
 	if (!glfwInit())
@@ -31,7 +45,7 @@ int Window::Initialize()
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE); // No backwards compatibility
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // Yes forward compatibility
-	window = glfwCreateWindow(initialSize.x, initialSize.y, "Test Window", NULL, NULL);
+	window = glfwCreateWindow(width, height, "Test Window", NULL, NULL);
 	if (!window)
 	{
 		printf("GLFW can't create window");
@@ -40,7 +54,7 @@ int Window::Initialize()
 	}
 
 	//Get Buffer size information
-	glfwGetFramebufferSize(window, &bufferSize.x, &bufferSize.y); //read the window and return width and height to our variables
+	glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
 
 	//Set the context for GLEW to use
 	glfwMakeContextCurrent(window);
@@ -55,7 +69,8 @@ int Window::Initialize()
 	//Initialize lastPos
 	double xPos, yPos;
 	glfwGetCursorPos(window, &xPos, &yPos);
-	lastPos = Vec2<GLint>(xPos, yPos);
+	lastX = xPos;
+	lastY = yPos;
 
 	//Initialize GLEW
 	if (glewInit() != GLEW_OK)
@@ -69,17 +84,25 @@ int Window::Initialize()
 	glEnable(GL_DEPTH_TEST);
 
 	//Setup Viewport Size
-	glViewport(0, 0, bufferSize.x, bufferSize.y);
+	glViewport(0, 0, bufferWidth, bufferHeight);
 
 	glfwSetWindowUserPointer(window, this);
 }
 
-Vec2<GLfloat> Window::GetMouseDelta()
+GLfloat Window::getXChange()
 {
-	Vec2<GLfloat> change = deltaPos;
-	deltaPos = (0, 0);
-	return change;
+	GLfloat theChange = xChange;
+	xChange = 0.0f;
+	return theChange;
 }
+
+GLfloat Window::getYChange()
+{
+	GLfloat theChange = yChange;
+	yChange = 0.0f;
+	return theChange;
+}
+
 GLfloat Window::GetScrollOffset()
 {
 	GLfloat currentOffset = scrollOffset;
@@ -124,9 +147,10 @@ void Window::HandleScroll(GLFWwindow* window, double xoffset, double yoffset)
 void Window::HandleMouse(GLFWwindow* window, double xPos, double yPos)
 {
 	Window* currentWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
-	currentWindow->deltaPos.x = xPos - currentWindow->lastPos.x;
-	currentWindow->deltaPos.y = currentWindow->lastPos.y - yPos;
-	currentWindow->lastPos = Vec2<GLint>(xPos, yPos);
+	currentWindow->xChange = xPos - currentWindow->lastX;
+	currentWindow->yChange = currentWindow->lastY - yPos;
+	currentWindow->lastX = xPos;
+	currentWindow->lastY = yPos;
 }
 
 Window::~Window()

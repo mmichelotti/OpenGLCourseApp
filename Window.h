@@ -3,23 +3,21 @@
 #include <stdio.h>
 #include <GL\glew.h>
 #include <GLFW\glfw3.h>
-#include "Vec2.h"
 
 class Window
 {
 public:
 	Window();
-	Window(Vec2<GLint> windowSize);
-	Window(GLint windowX, GLint windowY);
+	Window(GLint windowWidth, GLint windowHeight);
+	int Initialise();
 
-	int Initialize();
-
-	GLfloat GetBufferWidth() { return bufferSize.x; }
-	GLfloat GetBufferHeight() { return bufferSize.y; }
-	GLfloat GetAspectRatio() { return bufferSize.x / bufferSize.y; }
+	GLint GetBufferWidth() { return bufferWidth; }
+	GLint GetBufferHeight() { return bufferHeight; }
 
 	GLfloat GetScrollOffset();
-	Vec2<GLfloat> GetMouseDelta();
+	//Vec2<GLfloat> GetMouseDelta();
+	GLfloat getXChange();
+	GLfloat getYChange();
 	
 
 	bool ShouldClose() { return glfwWindowShouldClose(window); }
@@ -32,16 +30,14 @@ private:
 
 	GLFWwindow* window;
 
-	Vec2<GLint> initialSize;
-	Vec2<GLint> bufferSize;
+	GLint width, height;
+	GLint bufferWidth, bufferHeight;
 
 	bool keys[1024] = {};
 
-	GLfloat lastScroll = 0;
+	GLfloat lastX, lastY;
+	GLfloat xChange, yChange;
 	GLfloat scrollOffset = 0;
-
-	Vec2<GLfloat> lastPos;
-	Vec2<GLfloat> deltaPos = Vec2<GLfloat>(0, 0);
 
 	void CreateCallbacks();
 	static void HandleKeys(GLFWwindow* window, int key, int code, int action, int mode);
