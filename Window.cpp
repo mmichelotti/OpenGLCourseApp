@@ -5,28 +5,12 @@ Window::Window()
 {
 	width = 800;
 	height = 600;
-
-	for (size_t i = 0; i < 1024; i++)
-	{
-		keys[i] = 0;
-	}
-
-	xChange = 0.0f;
-	yChange = 0.0f;
 }
 
 Window::Window(GLint windowWidth, GLint windowHeight)
 {
 	width = windowWidth;
 	height = windowHeight;
-
-	for (size_t i = 0; i < 1024; i++)
-	{
-		keys[i] = 0;
-	}
-
-	xChange = 0.0f;
-	yChange = 0.0f;
 }
 
 
@@ -69,8 +53,8 @@ int Window::Initialise()
 	//Initialize lastPos
 	double xPos, yPos;
 	glfwGetCursorPos(window, &xPos, &yPos);
-	lastX = xPos;
-	lastY = yPos;
+	lastPos = Vec2<GLfloat>(xPos, yPos);
+
 
 	//Initialize GLEW
 	if (glewInit() != GLEW_OK)
@@ -88,20 +72,13 @@ int Window::Initialise()
 
 	glfwSetWindowUserPointer(window, this);
 }
-
-GLfloat Window::getXChange()
+Vec2<GLfloat> Window::GetMouseDelta()
 {
-	GLfloat theChange = xChange;
-	xChange = 0.0f;
-	return theChange;
+	Vec2<GLfloat> change = deltaPos;
+	deltaPos = (0, 0);
+	return change;
 }
 
-GLfloat Window::getYChange()
-{
-	GLfloat theChange = yChange;
-	yChange = 0.0f;
-	return theChange;
-}
 
 GLfloat Window::GetScrollOffset()
 {
@@ -147,10 +124,9 @@ void Window::HandleScroll(GLFWwindow* window, double xoffset, double yoffset)
 void Window::HandleMouse(GLFWwindow* window, double xPos, double yPos)
 {
 	Window* currentWindow = static_cast<Window*>(glfwGetWindowUserPointer(window));
-	currentWindow->xChange = xPos - currentWindow->lastX;
-	currentWindow->yChange = currentWindow->lastY - yPos;
-	currentWindow->lastX = xPos;
-	currentWindow->lastY = yPos;
+	currentWindow->deltaPos.x = xPos - currentWindow->lastPos.x;
+	currentWindow->deltaPos.y = currentWindow->lastPos.y - yPos;
+	currentWindow->lastPos = Vec2<GLint>(xPos, yPos);
 }
 
 Window::~Window()
