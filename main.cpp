@@ -194,7 +194,7 @@ int main()
 	GLuint uniformSpecular = 0;
 	GLuint uniformRoughness = 0;
 
-	glm::mat4 projection = glm::perspective(45.0f, mainWindow.GetAspectRatio(), 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(45.0f, (GLfloat)mainWindow.GetBufferWidth() / mainWindow.GetBufferHeight(), 0.1f, 100.0f);
 	
 	//Main Loop
 	while (!mainWindow.ShouldClose())
