@@ -161,11 +161,11 @@ int main()
 	camera = Camera(glm::vec3(0.0f, 4.0f, 4.0f), Vec2<GLfloat>(-90.0f, -45.0f));
 
 	brickTXT = Texture("Textures/brick.png");
-	brickTXT.Load();
+	brickTXT.LoadRGBA();
 	dirtTXT = Texture("Textures/dirt.png");
-	dirtTXT.Load();
+	dirtTXT.LoadRGBA();
 	blankTXT = Texture("Textures/plain.png");
-	blankTXT.Load();
+	blankTXT.LoadRGBA();
 
 	roughMaterial = Material(1.0f, 512);
 	dullMaterial = Material(0.3f,4);

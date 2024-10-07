@@ -13,7 +13,8 @@ public:
 
 	void Initialize();
 
-	void Load();
+	bool LoadRGBA();
+	bool LoadRGB();
 	void Use();
 	void Clear();
 

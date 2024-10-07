@@ -19,12 +19,13 @@ Texture::Texture(const char* fileLocation)
     this->fileLocation = fileLocation;
 }
 
-void Texture::Load()
+bool Texture::LoadRGBA()
 {
     unsigned char* texData = stbi_load(fileLocation, &size.x, &size.y, &bitDepth, 0);
     if (!texData)
     {
         printf("Failed to find %s\n", fileLocation);
+        return false;
     }
     glGenTextures(1, &ID);
     glBindTexture(GL_TEXTURE_2D, ID);
@@ -40,6 +41,31 @@ void Texture::Load()
     //unbind texture
     glBindTexture(GL_TEXTURE_2D, 0);
     stbi_image_free(texData);
+    return true;
+}
+bool Texture::LoadRGB()
+{
+    unsigned char* texData = stbi_load(fileLocation, &size.x, &size.y, &bitDepth, 0);
+    if (!texData)
+    {
+        printf("Failed to find %s\n", fileLocation);
+        return false;
+    }
+    glGenTextures(1, &ID);
+    glBindTexture(GL_TEXTURE_2D, ID);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT); //texture repeat along x axis
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT); //texture repeat along y axis
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); //blend pixel together, GL_NEAREST keep pixelated
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_REPEAT); //texture repeat along x axis
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.x, size.y, 0, GL_RGB, GL_UNSIGNED_BYTE, texData);
+    glGenerateMipmap(GL_TEXTURE_2D);
+
+    //unbind texture
+    glBindTexture(GL_TEXTURE_2D, 0);
+    stbi_image_free(texData);
+    return true;
 }
 
 void Texture::Use()
