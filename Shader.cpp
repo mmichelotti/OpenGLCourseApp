@@ -13,8 +13,7 @@ void Shader::SetDirectionalLight(DirectionalLight* dirLight)
 }
 void Shader::SetPointLights(std::vector<PointLight>* pLight)
 {
-	unsigned int lightCount = glm::min(pLight->size(), MAX_POINT_LIGHTS);
-
+	unsigned int lightCount = glm::min((unsigned int)pLight->size(), (unsigned int)MAX_POINT_LIGHTS);
 	glUniform1i(uniformPointLight->count, lightCount);
 
 	for (size_t i = 0; i < lightCount; i++)
@@ -33,7 +32,7 @@ void Shader::SetPointLights(std::vector<PointLight>* pLight)
 }
 void Shader::SetSpotLights(std::vector<SpotLight>* sLights)
 {
-	unsigned int lightCount = glm::min(sLights->size(), MAX_SPOT_LIGHTS);
+	unsigned int lightCount = glm::min((unsigned int)sLights->size(), (unsigned int)MAX_SPOT_LIGHTS);
 
 	glUniform1i(uniformSpotLight->count, lightCount);
 

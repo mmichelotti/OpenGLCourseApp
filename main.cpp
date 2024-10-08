@@ -23,6 +23,7 @@
 #include "CommonValues.h"
 #include "PointLight.h"
 #include "SpotLight.h"
+#include <assimp/Importer.hpp>
 
 //GL => The actual graphics API
 //GLEW => OpenGL Extensions for additional OpenGL features and extensions, since OpenGL can differ across platforms
@@ -195,6 +196,11 @@ int main()
 	GLuint uniformRoughness = 0;
 
 	glm::mat4 projection = glm::perspective(45.0f, mainWindow.GetAspectRatio(), 0.1f, 100.0f);
+
+	//Assimp not working
+	//In case to remove ASSIMP /Include and /lib
+	// and assimp.dll on the main root directory
+	//Assimp::Importer importer = Assimp::Importer();
 	
 	//Main Loop
 	while (!mainWindow.ShouldClose())
