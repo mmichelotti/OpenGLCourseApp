@@ -24,6 +24,7 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include <assimp/Importer.hpp>
+#include "Model.h"
 
 //GL => The actual graphics API
 //GLEW => OpenGL Extensions for additional OpenGL features and extensions, since OpenGL can differ across platforms
@@ -60,6 +61,8 @@ Texture blankTXT;
 
 Material roughMaterial;
 Material dullMaterial;
+
+Model blackhawk;
 
 DirectionalLight mainLight;
 std::vector<PointLight> pointLights;
@@ -171,6 +174,10 @@ int main()
 	roughMaterial = Material(1.0f, 512);
 	dullMaterial = Material(0.3f,4);
 
+
+	blackhawk = Model();
+	blackhawk.LoadModel("Models/uh60.obj");
+
 	Light generic = Light(Color::Blue, 1.0f, 1.0f);
 	mainLight = DirectionalLight(Light(Color::White, 0.1f, 0.1f), glm::vec3(2.0f, 1.0f, -2.0f));
 	PointLight pLight1 = PointLight(Light(Color::Red, 0.4f, 0.1f), glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
@@ -265,6 +272,14 @@ int main()
 		dirtTXT.Use();
 		roughMaterial.Use(uniformSpecular, uniformRoughness);
 		meshes[1]->Render();
+
+		model = glm::mat4(1.0f);
+		model = glm::translate(model, glm::vec3(-3.0f, 2.0f, 0.0f));
+		model = glm::rotate(model, -90.0f * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
+		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		roughMaterial.Use(uniformSpecular, uniformRoughness);
+		blackhawk.RenderModel();
 
 		glUseProgram(0);
 
