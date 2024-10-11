@@ -6,7 +6,7 @@ class Mesh
 {
 public:
 	Mesh();
-	Mesh(const std::vector<GLfloat>& vertices, std::vector<unsigned int>& indices);
+	Mesh(const std::vector<GLfloat>& vertices, const std::vector<unsigned int>& indices);
 	
 	void Render();
 	void Clear();
@@ -19,6 +19,6 @@ private:
 	GLuint IBO; //Index Buffer Object
 	GLsizei indexCount;
 
-	void Create(const std::vector<GLfloat>& vertices, std::vector<unsigned int>& indices);
+	void Create(const std::vector<GLfloat>& vertices, const std::vector<unsigned int>& indices);
 };
 

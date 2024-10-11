@@ -8,7 +8,6 @@ struct Vec2
 {
 public:
     T x, y;
-
     // Default constructor
     Vec2(T x = T(), T y = T()) : x(x), y(y) {}
 

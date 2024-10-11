@@ -6,20 +6,20 @@ Model::Model()
 
 void Model::RenderModel()
 {
-	for (size_t i = 0; i < meshList.size(); i++)
+	for (size_t i = 0; i < meshes.size(); i++)
 	{
 		unsigned int materialIndex = meshToTex[i];
 
-		if (materialIndex < textureList.size() && textureList[materialIndex])
+		if (materialIndex < textures.size() && textures[materialIndex])
 		{
-			textureList[materialIndex]->Use();
+			textures[materialIndex]->Use();
 		}
 
-		meshList[i]->Render();
+		meshes[i]->Render();
 	}
 }
 
-void Model::LoadModel(const std::string & fileName)
+void Model::LoadModel(const std::string& fileName)
 {
 	Assimp::Importer importer;
 	const aiScene *scene = importer.ReadFile(fileName, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices);
@@ -35,11 +35,11 @@ void Model::LoadModel(const std::string & fileName)
 	LoadMaterials(scene);
 }
 
-void Model::LoadNode(aiNode * node, const aiScene * scene)
+void Model::LoadNode(aiNode* node, const aiScene* scene)
 {
 	for (size_t i = 0; i < node->mNumMeshes; i++)
 	{
-		LoadMesh(scene->mMeshes[node->mMeshes[i]], scene);
+		LoadMesh(scene->mMeshes[node->mMeshes[i]]);
 	}
 
 	for (size_t i = 0; i < node->mNumChildren; i++)
@@ -48,48 +48,55 @@ void Model::LoadNode(aiNode * node, const aiScene * scene)
 	}
 }
 
-void Model::LoadMesh(aiMesh * mesh, const aiScene * scene)
+std::vector<GLfloat> Model::GetVertexBuffer(const aiMesh* mesh)
 {
 	std::vector<GLfloat> vertices;
-	std::vector<unsigned int> indices;
 
 	for (size_t i = 0; i < mesh->mNumVertices; i++)
 	{
-		//x,y,z then u,v then r,g,b 
-		vertices.insert(vertices.end(), { mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z });
-		if (mesh->mTextureCoords[0])
-		{
-			vertices.insert(vertices.end(), { mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y });
-		}
-		else {
-			vertices.insert(vertices.end(), { 0.0f, 0.0f });
-		}
-		vertices.insert(vertices.end(), { -mesh->mNormals[i].x, -mesh->mNormals[i].y, -mesh->mNormals[i].z });
-	}
+		aiVector3D& vertex = mesh->mVertices[i];
+		aiVector3D* texture = mesh->mTextureCoords[0];
+		aiVector3D& normals = mesh->mNormals[i];
+		Vec2<GLfloat> uv = texture ? Vec2<GLfloat>(texture[i].x, texture[i].y) : Vec2<GLfloat>();
 
+		//x,y,z then u,v then r,g,b 
+		vertices.insert(vertices.end(), { vertex.x, vertex.y, vertex.z });
+		vertices.insert(vertices.end(), { uv.x, uv.y });
+		vertices.insert(vertices.end(), { -normals.x, -normals.y, -normals.z });
+	}
+	return vertices;
+}
+
+std::vector<unsigned int> Model::GetIndexBuffer(const aiMesh* mesh)
+{
+	std::vector<unsigned int> indices;
 	for (size_t i = 0; i < mesh->mNumFaces; i++)
 	{
-		aiFace face = mesh->mFaces[i];
+		aiFace& face = mesh->mFaces[i];
 		for (size_t j = 0; j < face.mNumIndices; j++)
 		{
 			indices.push_back(face.mIndices[j]);
 		}
 	}
+	return indices;
+}
 
-	Mesh* newMesh = new Mesh(vertices, indices);
-	meshList.push_back(newMesh);
+void Model::LoadMesh(const aiMesh* mesh)
+{
+	Mesh* newMesh = new Mesh(GetVertexBuffer(mesh), GetIndexBuffer(mesh));
+	meshes.push_back(newMesh);
 	meshToTex.push_back(mesh->mMaterialIndex);
 }
 
-void Model::LoadMaterials(const aiScene * scene)
+void Model::LoadMaterials(const aiScene* scene)
 {
-	textureList.resize(scene->mNumMaterials);
+	textures.resize(scene->mNumMaterials);
 	
 	for (size_t i = 0; i < scene->mNumMaterials; i++)
 	{
 		aiMaterial* material = scene->mMaterials[i];
 
-		textureList[i] = nullptr;
+		textures[i] = nullptr;
 
 		if (material->GetTextureCount(aiTextureType_DIFFUSE))
 		{
@@ -101,42 +108,42 @@ void Model::LoadMaterials(const aiScene * scene)
 
 				std::string texPath = std::string("Textures/") + filename;
 
-				textureList[i] = new Texture(texPath.c_str());
+				textures[i] = new Texture(texPath.c_str());
 
-				if (!textureList[i]->LoadRGB())
+				if (!textures[i]->LoadRGB())
 				{
 					printf("Failed to load texture at: %s\n", texPath);
-					delete textureList[i];
-					textureList[i] = nullptr;
+					delete textures[i];
+					textures[i] = nullptr;
 				}
 			}
 		}
 
-		if (!textureList[i])
+		if (!textures[i])
 		{
-			textureList[i] = new Texture("Textures/plain.png");
-			textureList[i]->LoadRGBA();
+			textures[i] = new Texture("Textures/plain.png");
+			textures[i]->LoadRGBA();
 		}
 	}
 }
 
 void Model::ClearModel()
 {
-	for (size_t i = 0; i < meshList.size(); i++)
+	for (size_t i = 0; i < meshes.size(); i++)
 	{
-		if (meshList[i])
+		if (meshes[i])
 		{
-			delete meshList[i];
-			meshList[i] = nullptr;
+			delete meshes[i];
+			meshes[i] = nullptr;
 		}
 	}
 
-	for (size_t i = 0; i < textureList.size(); i++)
+	for (size_t i = 0; i < textures.size(); i++)
 	{
-		if (textureList[i])
+		if (textures[i])
 		{
-			delete textureList[i];
-			textureList[i] = nullptr;
+			delete textures[i];
+			textures[i] = nullptr;
 		}
 	}
 }

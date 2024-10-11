@@ -12,7 +12,7 @@ Mesh::Mesh()
 	indexCount = 0;
 }
 
-Mesh::Mesh(const std::vector<GLfloat>& vertices, std::vector<unsigned int>& indices)
+Mesh::Mesh(const std::vector<GLfloat>& vertices, const std::vector<unsigned int>& indices)
 {
 	VAO = 0;
 	VBO = 0;
@@ -29,7 +29,7 @@ Mesh::Mesh(const std::vector<GLfloat>& vertices, std::vector<unsigned int>& indi
 	But in this case, adding the keyword const promises that the value of vertices and indices won't change
 	So this all mean that we are READING ONLY a direct reference to an array
 */
-void Mesh::Create(const std::vector<GLfloat>& vertices, std::vector<unsigned int>& indices)
+void Mesh::Create(const std::vector<GLfloat>& vertices, const std::vector<unsigned int>& indices)
 {
 	unsigned int verticesAmount = vertices.size();
 	unsigned int indicesAmount = indices.size();

@@ -22,13 +22,14 @@ public:
 	~Model();
 
 private:
-
+	std::vector<GLfloat> GetVertexBuffer(const aiMesh* mesh);
+	std::vector<unsigned int> GetIndexBuffer(const aiMesh* mesh);
+	void LoadMesh(const aiMesh *mesh);
 	void LoadNode(aiNode *node, const aiScene *scene);
-	void LoadMesh(aiMesh *mesh, const aiScene *scene);
 	void LoadMaterials(const aiScene *scene);
 
-	std::vector<Mesh*> meshList;
-	std::vector<Texture*> textureList;
+	std::vector<Mesh*> meshes;
+	std::vector<Texture*> textures;
 	std::vector<unsigned int> meshToTex;
 };
 
