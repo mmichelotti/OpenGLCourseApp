@@ -20,7 +20,7 @@
 #include "Texture.h"
 #include "DirectionalLight.h"
 #include "Material.h"
-#include "CommonValues.h"
+#include "Global.h"
 #include "PointLight.h"
 #include "SpotLight.h"
 #include <assimp/Importer.hpp>
@@ -281,7 +281,10 @@ int main()
 		roughMaterial.Use(uniformSpecular, uniformRoughness);
 		blackhawk.RenderModel();
 
+
+		
 		glUseProgram(0);
+
 
 		mainWindow.SwapBuffers();
 	}

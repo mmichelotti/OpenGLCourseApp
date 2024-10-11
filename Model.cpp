@@ -1,11 +1,22 @@
 #include "Model.h"
+#include "Global.h"
+
+
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
+#include <GLM/glm.hpp>
+#include <GLM/gtc/matrix_transform.hpp>
+#include <GLM/gtc/type_ptr.hpp>
 
 Model::Model()
 {
+	model = glm::mat4(1.0f);
 }
 
 void Model::RenderModel()
 {
+	if (!meshes[0]) return;
 	for (size_t i = 0; i < meshes.size(); i++)
 	{
 		unsigned int materialIndex = meshToTex[i];
@@ -113,8 +124,7 @@ void Model::LoadMaterials(const aiScene* scene)
 				if (!textures[i]->LoadRGB())
 				{
 					printf("Failed to load texture at: %s\n", texPath);
-					delete textures[i];
-					textures[i] = nullptr;
+					SAFE_DELETE(textures[i]);
 				}
 			}
 		}
@@ -127,27 +137,35 @@ void Model::LoadMaterials(const aiScene* scene)
 	}
 }
 
-void Model::ClearModel()
+void Model::Clear()
 {
 	for (size_t i = 0; i < meshes.size(); i++)
 	{
-		if (meshes[i])
-		{
-			delete meshes[i];
-			meshes[i] = nullptr;
-		}
+		if (meshes[i]) SAFE_DELETE(meshes[i]);
 	}
 
 	for (size_t i = 0; i < textures.size(); i++)
 	{
-		if (textures[i])
-		{
-			delete textures[i];
-			textures[i] = nullptr;
-		}
+		if (textures[i]) SAFE_DELETE(textures[i]);
 	}
+}
+
+void Model::Translate(glm::vec3 offset) 
+{
+	model = glm::translate(model, offset);
+}
+
+void Model::Rotate(float angle, glm::vec3 axis) 
+{
+	model = glm::rotate(model, angle, axis);
+}
+
+void Model::Scale(glm::vec3 scale) 
+{
+	model = glm::scale(model, scale); 
 }
 
 Model::~Model()
 {
+	Clear();
 }
