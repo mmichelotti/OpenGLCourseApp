@@ -24,7 +24,7 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include <assimp/Importer.hpp>
-#include "Model.h"
+#include "Object.h"
 
 //GL => The actual graphics API
 //GLEW => OpenGL Extensions for additional OpenGL features and extensions, since OpenGL can differ across platforms
@@ -62,7 +62,7 @@ Texture blankTXT;
 Material roughMaterial;
 Material dullMaterial;
 
-Model blackhawk;
+Object blackhawk;
 
 DirectionalLight mainLight;
 std::vector<PointLight> pointLights;
@@ -153,14 +153,14 @@ void CalculateAverageNormal(std::vector<GLfloat>& vertices, std::vector<unsigned
 }
 void CreateShaders() 
 {
-	Shader *shader1 = new Shader();
+	Shader* shader1 = new Shader();
 	shader1->CreateFromFile(vShader, fShader);
 	shaders.push_back(*shader1);
 }
 int main()
 {
 
-	mainWindow = Window(1366, 768);
+	mainWindow = Window(1920, 1080);
 	mainWindow.Initialize();
 	camera = Camera(glm::vec3(0.0f, 4.0f, 4.0f), Vec2<GLfloat>(-90.0f, -45.0f));
 
@@ -175,8 +175,8 @@ int main()
 	dullMaterial = Material(0.3f,4);
 
 
-	blackhawk = Model();
-	blackhawk.LoadModel("Models/uh60.obj");
+	blackhawk = Object();
+	blackhawk.Load("Models/uh60.obj");
 
 	Light generic = Light(Color::Blue, 1.0f, 1.0f);
 	mainLight = DirectionalLight(Light(Color::White, 0.1f, 0.1f), glm::vec3(2.0f, 1.0f, -2.0f));
@@ -264,28 +264,25 @@ int main()
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		brickTXT.Use();
 		dullMaterial.Use(uniformSpecular, uniformRoughness);
-		meshes[0]->Render();
+		meshes.at(0)->Render();
+		
 
 		model = glm::mat4(1.0f);
 		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 		dirtTXT.Use();
 		roughMaterial.Use(uniformSpecular, uniformRoughness);
-		meshes[1]->Render();
+		meshes.at(1)->Render();
 
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(-3.0f, 2.0f, 0.0f));
-		model = glm::rotate(model, -90.0f * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
-		model = glm::scale(model, glm::vec3(0.4f, 0.4f, 0.4f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+		blackhawk.transform.SetPosition(glm::vec3(-3.0f, 2.0f, 0.0f));
+		blackhawk.transform.SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
+		blackhawk.transform.SetScale(glm::vec3(0.4f, 0.4f, 0.4f));
+		blackhawk.transform.UpdateModelMatrix(uniformModel);
+
 		roughMaterial.Use(uniformSpecular, uniformRoughness);
-		blackhawk.RenderModel();
+		blackhawk.Render();
 
-
-		
 		glUseProgram(0);
-
-
 		mainWindow.SwapBuffers();
 	}
 

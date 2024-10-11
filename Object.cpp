@@ -1,4 +1,4 @@
-#include "Model.h"
+#include "Object.h"
 #include "Global.h"
 
 
@@ -9,12 +9,15 @@
 #include <GLM/gtc/matrix_transform.hpp>
 #include <GLM/gtc/type_ptr.hpp>
 
-Model::Model()
+
+
+Object::Object()
 {
-	model = glm::mat4(1.0f);
+	transform = Transform();
 }
 
-void Model::RenderModel()
+
+void Object::Render()
 {
 	if (!meshes[0]) return;
 	for (size_t i = 0; i < meshes.size(); i++)
@@ -30,11 +33,10 @@ void Model::RenderModel()
 	}
 }
 
-void Model::LoadModel(const std::string& fileName)
+void Object::Load(const std::string& fileName)
 {
 	Assimp::Importer importer;
 	const aiScene *scene = importer.ReadFile(fileName, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices);
-
 	if (!scene)
 	{
 		printf("Model (%s) failed to load: %s", fileName, importer.GetErrorString());
@@ -46,7 +48,7 @@ void Model::LoadModel(const std::string& fileName)
 	LoadMaterials(scene);
 }
 
-void Model::LoadNode(aiNode* node, const aiScene* scene)
+void Object::LoadNode(aiNode* node, const aiScene* scene)
 {
 	for (size_t i = 0; i < node->mNumMeshes; i++)
 	{
@@ -59,7 +61,7 @@ void Model::LoadNode(aiNode* node, const aiScene* scene)
 	}
 }
 
-std::vector<GLfloat> Model::GetVertexBuffer(const aiMesh* mesh)
+std::vector<GLfloat> Object::GetVertexBuffer(const aiMesh* mesh)
 {
 	std::vector<GLfloat> vertices;
 
@@ -78,7 +80,7 @@ std::vector<GLfloat> Model::GetVertexBuffer(const aiMesh* mesh)
 	return vertices;
 }
 
-std::vector<unsigned int> Model::GetIndexBuffer(const aiMesh* mesh)
+std::vector<unsigned int> Object::GetIndexBuffer(const aiMesh* mesh)
 {
 	std::vector<unsigned int> indices;
 	for (size_t i = 0; i < mesh->mNumFaces; i++)
@@ -92,14 +94,14 @@ std::vector<unsigned int> Model::GetIndexBuffer(const aiMesh* mesh)
 	return indices;
 }
 
-void Model::LoadMesh(const aiMesh* mesh)
+void Object::LoadMesh(const aiMesh* mesh)
 {
 	Mesh* newMesh = new Mesh(GetVertexBuffer(mesh), GetIndexBuffer(mesh));
 	meshes.push_back(newMesh);
 	meshToTex.push_back(mesh->mMaterialIndex);
 }
 
-void Model::LoadMaterials(const aiScene* scene)
+void Object::LoadMaterials(const aiScene* scene)
 {
 	textures.resize(scene->mNumMaterials);
 	
@@ -137,7 +139,7 @@ void Model::LoadMaterials(const aiScene* scene)
 	}
 }
 
-void Model::Clear()
+void Object::Clear()
 {
 	for (size_t i = 0; i < meshes.size(); i++)
 	{
@@ -150,22 +152,7 @@ void Model::Clear()
 	}
 }
 
-void Model::Translate(glm::vec3 offset) 
-{
-	model = glm::translate(model, offset);
-}
-
-void Model::Rotate(float angle, glm::vec3 axis) 
-{
-	model = glm::rotate(model, angle, axis);
-}
-
-void Model::Scale(glm::vec3 scale) 
-{
-	model = glm::scale(model, scale); 
-}
-
-Model::~Model()
+Object::~Object()
 {
 	Clear();
 }
