@@ -278,8 +278,7 @@ int main()
 		blackhawk.transform.SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
 		blackhawk.transform.SetScale(glm::vec3(0.4f, 0.4f, 0.4f));
 		blackhawk.transform.UpdateModelMatrix(uniformModel);
-
-		roughMaterial.Use(uniformSpecular, uniformRoughness);
+		dullMaterial.Use(uniformSpecular, uniformRoughness);
 		blackhawk.Render();
 
 		glUseProgram(0);

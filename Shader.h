@@ -12,6 +12,8 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include "Global.h"
+#include <GLM/gtc/type_ptr.hpp>
+#include <GLM/glm.hpp>
 
 class Shader
 {
@@ -38,6 +40,9 @@ public:
 	void SetDirectionalLight(DirectionalLight* dirLight);
 	void SetPointLights(std::vector<PointLight>* pLight);
 	void SetSpotLights(std::vector<SpotLight>* sLights);
+	void SetTexture(GLuint textureUnit);
+	void SetDirectionalShadowMap(GLuint textureUnit);
+	void SetDirectionalLightTransform(glm::mat4* transform);
 
 
 	~Shader();
@@ -49,6 +54,8 @@ private:
 	GLuint uniformModel;
 	GLuint uniformView;
 	GLuint uniformEyePosition;
+	GLuint uniformTexture;
+	GLuint uniformDirectionalLightTransform, uniformDirectionalShadowMap;
 
 
 	struct
@@ -86,6 +93,7 @@ private:
 		GLuint position;
 		GLuint direction;
 		GLuint radius;
+
 	} uniformSpotLight[MAX_SPOT_LIGHTS];
 
 	void Compile(const char* vertexCode, const char* fragmentCode);

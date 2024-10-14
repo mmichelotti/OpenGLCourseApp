@@ -9,6 +9,7 @@ in vec4 VertexColor;
 in vec2 TexCoord;
 in vec3 Normal;
 in vec3 FragPos;
+in vec4 DirectionalLightSpacePos;
 out vec4 Color;	
 
 struct Light
@@ -50,11 +51,22 @@ uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 uniform int pointLightCount;
 uniform int spotLightCount;
 uniform sampler2D theTexture;
+uniform sampler2D directionalShadowMap;
 uniform Material material;
 uniform vec3 eyePosition;
 
+float CalculateDirectionalShadowFactor(DirectionalLight light)
+{
+    vec3 projCoords = DirectionalLightSpacePos.xyz / DirectionalLightSpacePos.w;
+    projCoords = (projCoords * 0.5f) + 0.5f;
+    float closest = texture(directionalShadowMap, projCoords.xy).r;
+    float current = projCoords.z;
+    //refactor this if
+    return current > closest ? 1.0f : 0.0f;
+}
 
-vec4 CalculateLightByDirection(Light light, vec3 direction)
+
+vec4 CalculateLightByDirection(Light light, vec3 direction, float shadowFactor)
 {
     // A.B = |A||B| * cos(angle)
     // The length of A and B is normalized so
@@ -80,7 +92,7 @@ vec4 CalculateLightByDirection(Light light, vec3 direction)
             specularColor = light.color * material.specular * specularFactor;
         }
     }
-    return vec4(ambientColor + diffuseColor + specularColor, 1.0f);
+    return vec4(ambientColor + (1.0f - shadowFactor) * (diffuseColor + specularColor), 1.0f);
 }
 vec4 CalculatePointLight(PointLight pLight)
 {
@@ -93,7 +105,7 @@ vec4 CalculatePointLight(PointLight pLight)
         float c = pLight.constant;
         float attenuation = (a*x*x) + (b*x) + (c);
 
-        vec4 lightColor = CalculateLightByDirection(pLight.base, direction);
+        vec4 lightColor = CalculateLightByDirection(pLight.base, direction, 0.0f);
         return (lightColor/attenuation);
 }
 vec4 CalculateSpotLight(SpotLight sLight)
@@ -129,7 +141,11 @@ vec4 SpotLightsColor()
     };
     return color;
 }
-vec4 DirectionalLightColor(){return CalculateLightByDirection(directionalLight.base, directionalLight.direction);}
+vec4 DirectionalLightColor()
+{
+    float shadowFactor = CalculateDirectionalShadowFactor(directionalLight);
+    return CalculateLightByDirection(directionalLight.base, directionalLight.direction, shadowFactor);  
+}
 void main()			
 {	
     //texture() glsl method to sample a texture
