@@ -42,7 +42,7 @@ public:
 	void SetSpotLights(std::vector<SpotLight>* sLights);
 	void SetTexture(GLuint textureUnit);
 	void SetDirectionalShadowMap(GLuint textureUnit);
-	void SetDirectionalLightTransform(glm::mat4* transform);
+	void SetDirectionalLightTransform(const glm::mat4& transform);
 
 
 	~Shader();

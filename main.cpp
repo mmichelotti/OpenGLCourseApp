@@ -42,6 +42,14 @@ const float toRadians = 3.14159265f / 180.0f; //converting a full circle from 2P
 static const char* vShader = "Shaders/main.vert";
 static const char* fShader = "Shaders/main.frag";
 
+GLuint uniformProjection = 0;
+GLuint uniformModel = 0;
+GLuint uniformView = 0;
+GLuint uniformEyePosition = 0;
+
+GLuint uniformSpecular = 0;
+GLuint uniformRoughness = 0;
+
 /*
 An index buffer is mostly identical to a vertex buffer
 The core difference is that the index buffer groups the vertices that are overlapping
@@ -53,6 +61,7 @@ Window mainWindow;
 Camera camera;
 std::vector<Mesh*> meshes;
 std::vector<Shader> shaders;
+Shader directionalShadow;
 
 
 Texture brickTXT;
@@ -63,6 +72,7 @@ Material roughMaterial;
 Material dullMaterial;
 
 Object blackhawk;
+GLfloat blackhawkAngle = 0.0f;
 
 DirectionalLight mainLight;
 std::vector<PointLight> pointLights;
@@ -156,6 +166,99 @@ void CreateShaders()
 	Shader* shader1 = new Shader();
 	shader1->CreateFromFile(vShader, fShader);
 	shaders.push_back(*shader1);
+	directionalShadow = Shader();
+	directionalShadow.CreateFromFile("Shaders/DirectionalShadowMap.vert", "Shaders/DirectionalShadowMap.frag");
+}
+void RenderFrame()
+{
+	glm::mat4 model(1.0f);
+
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	brickTXT.Use();
+	dullMaterial.Use(uniformSpecular, uniformRoughness);
+	meshes.at(0)->Render();
+
+
+	model = glm::mat4(1.0f);
+	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
+	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
+	dirtTXT.Use();
+	roughMaterial.Use(uniformSpecular, uniformRoughness);
+	meshes.at(1)->Render();
+
+	blackhawkAngle += 0.1f;
+	if (blackhawkAngle > 360) blackhawkAngle = 0.1f;
+
+	blackhawk.transform.SetPosition(glm::vec3(-8.0f, 2.0f, 0.0f));
+	blackhawk.transform.SetRotation(glm::vec3(-90.0f, blackhawkAngle, 0.0f));
+	blackhawk.transform.SetScale(glm::vec3(0.4f, 0.4f, 0.4f));
+	blackhawk.transform.UpdateModelMatrix(uniformModel);
+	dullMaterial.Use(uniformSpecular, uniformRoughness);
+	blackhawk.Render();
+}
+void DirectionalShadowMapPass(DirectionalLight* dirLight)
+{
+	directionalShadow.Use();
+	glViewport(0, 0, dirLight->GetProperties().GetShadowMap()->GetShadowWidth(), dirLight->GetProperties().GetShadowMap()->GetShadowHeight());
+	dirLight->GetProperties().GetShadowMap()->Write();
+	glClear(GL_DEPTH_BUFFER_BIT);
+	uniformModel = directionalShadow.GetModelLocation();
+	directionalShadow.SetDirectionalLightTransform(dirLight->CalculateLightTransform());
+	RenderFrame();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
+{
+	//Identity Matrix 
+/*
+	1 0 0 0
+	0 1 0 0
+	0 0 1 0
+	0 0 0 1
+*/
+	//Uniform variables are a constant through all the shader, not influenced by each single vertex
+/*
+	Of course the objects distorts becuase there is no projection matrix applied to the geometry
+	the default matrix system is the window coordinate system, so as we rotate an object on a non uniform window
+	the object will deform to match the window coordynate system
+
+	so the order matters, even when scaling
+	to make translations absolute we need to apply them first
+	if we want them relative we need to apply after
+*/
+	shaders[0].Use();
+
+	uniformModel = shaders[0].GetModelLocation();
+	uniformProjection = shaders[0].GetProjectionLocation();
+	uniformView = shaders[0].GetViewLocation();
+	uniformEyePosition = shaders[0].GetEyePositionLocation();
+	uniformSpecular = shaders[0].GetSpecularLocation();
+	uniformRoughness = shaders[0].GetRoughnessLocation();
+
+	glViewport(0, 0, 1920, 1080);
+	//Clear the whole window
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); //Set it to white
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Clear other pixel informations (in this case color and depth buffer)
+
+	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
+	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+	glUniform3f(uniformEyePosition, camera.GetCameraPosition().x, camera.GetCameraPosition().y, camera.GetCameraPosition().z);
+
+
+	spotLights.at(0).SetPositionAndDirection(camera.GetCameraPosition(), camera.GetCameraDirection());
+
+	shaders[0].SetDirectionalLight(&mainLight);
+	shaders[0].SetPointLights(&pointLights);
+	shaders[0].SetSpotLights(&spotLights);
+	shaders[0].SetDirectionalLightTransform(mainLight.CalculateLightTransform());
+
+	mainLight.GetProperties().GetShadowMap()->Read(GL_TEXTURE1);
+	shaders[0].SetTexture(0);
+	shaders[0].SetDirectionalShadowMap(1);
+
+	RenderFrame();
 }
 int main()
 {
@@ -178,13 +281,13 @@ int main()
 	blackhawk = Object();
 	blackhawk.Load("Models/uh60.obj");
 
-	Light generic = Light(Color::Blue, 1.0f, 1.0f);
-	mainLight = DirectionalLight(Light(Color::White, 0.1f, 0.1f), glm::vec3(2.0f, 1.0f, -2.0f));
-	PointLight pLight1 = PointLight(Light(Color::Red, 0.4f, 0.1f), glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
-	PointLight pLight2 = PointLight(Light(Color::Green, 0.4f, 0.1f), glm::vec3(2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
+
+	mainLight = DirectionalLight(Light(2048,Color::White, 0.3f, 0.1f), glm::vec3(0.0f, -7.0f, -1.0f));
+	PointLight pLight1 = PointLight(Light(2048,Color::Red, 0.4f, 0.1f), glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
+	PointLight pLight2 = PointLight(Light(2048,Color::Green, 0.4f, 0.1f), glm::vec3(2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
 	pointLights.emplace_back(pLight1);
 	pointLights.emplace_back(pLight2);
-	SpotLight sLight1 = SpotLight(generic, glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f), glm::vec3(0.0f, -1.0f, 0.0f), 20.0f);
+	SpotLight sLight1 = SpotLight(Light(2048,Color::Blue, 1.0f, 1.0f), glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f), glm::vec3(0.0f, -1.0f, 0.0f), 20.0f);
 	spotLights.emplace_back(sLight1);
 
 	CalculateAverageNormal(pyramidVertices, pyramidIndices, 8, 5);
@@ -194,17 +297,8 @@ int main()
 
 	CreateShaders();
 
-	GLuint uniformProjection = 0;
-	GLuint uniformModel = 0;
-	GLuint uniformView = 0;
-	GLuint uniformEyePosition = 0;
-
-	GLuint uniformSpecular = 0;
-	GLuint uniformRoughness = 0;
-
 	glm::mat4 projection = glm::perspective(45.0f, mainWindow.GetAspectRatio(), 0.1f, 100.0f);
 
-	
 	//Main Loop
 	while (!mainWindow.ShouldClose())
 	{
@@ -214,73 +308,8 @@ int main()
 		camera.KeyControl(mainWindow.GetKeys(), mainWindow.GetScrollDelta());
 		camera.MouseControl(mainWindow.GetMouseDelta());
 
-		//Clear the whole window
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f); //Set it to white
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Clear other pixel informations (in this case color and depth buffer)
-
-		//Bind shader
-		shaders[0].Use();
-
-		uniformModel = shaders[0].GetModelLocation();
-		uniformProjection = shaders[0].GetProjectionLocation();
-		uniformView = shaders[0].GetViewLocation();
-
-		uniformEyePosition = shaders[0].GetEyePositionLocation();
-		uniformSpecular = shaders[0].GetSpecularLocation();
-		uniformRoughness = shaders[0].GetRoughnessLocation();
-
-		spotLights.at(0).SetPositionAndDirection(camera.GetCameraPosition(), camera.GetCameraDirection());
-		//shaders[0].SetDirectionalLight(&mainLight);
-		shaders[0].SetPointLights(&pointLights);
-		shaders[0].SetSpotLights(&spotLights);
-
-
-		//Identity Matrix 
-		/*
-			1 0 0 0 
-			0 1 0 0
-			0 0 1 0
-			0 0 0 1
-		*/
-		//Uniform variables are a constant through all the shader, not influenced by each single vertex
-		/* 
-			Of course the objects distorts becuase there is no projection matrix applied to the geometry
-			the default matrix system is the window coordinate system, so as we rotate an object on a non uniform window
-			the object will deform to match the window coordynate system
-			
-			so the order matters, even when scaling
-			to make translations absolute we need to apply them first
-			if we want them relative we need to apply after
-		*/
-
-		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projection));
-		glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(camera.ViewMatrix()));
-		glUniform3f(uniformEyePosition, camera.GetCameraPosition().x, camera.GetCameraPosition().y, camera.GetCameraPosition().z);
-
-		glm::mat4 model(1.0f);
-
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		brickTXT.Use();
-		dullMaterial.Use(uniformSpecular, uniformRoughness);
-		meshes.at(0)->Render();
-		
-
-		model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-		dirtTXT.Use();
-		roughMaterial.Use(uniformSpecular, uniformRoughness);
-		meshes.at(1)->Render();
-
-		blackhawk.transform.SetPosition(glm::vec3(-3.0f, 2.0f, 0.0f));
-		blackhawk.transform.SetRotation(glm::vec3(-90.0f, 0.0f, 0.0f));
-		blackhawk.transform.SetScale(glm::vec3(0.4f, 0.4f, 0.4f));
-		blackhawk.transform.UpdateModelMatrix(uniformModel);
-		dullMaterial.Use(uniformSpecular, uniformRoughness);
-		blackhawk.Render();
-
+		DirectionalShadowMapPass(&mainLight);
+		RenderPass(projection, camera.ViewMatrix());
 		glUseProgram(0);
 		mainWindow.SwapBuffers();
 	}

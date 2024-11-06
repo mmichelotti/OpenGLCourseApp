@@ -1,2 +1,5 @@
-#version 3.30
-void main(){}
+#version 330
+
+void main()
+{
+}
