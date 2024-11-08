@@ -11,8 +11,8 @@ DirectionalLight::DirectionalLight(Light light, GLfloat shadowResolution, glm::v
 	: light(light), direction(direction) 
 {	
 	this->light.projection = glm::ortho(-20.0f, 20.0f, -20.0f, 20.0f, 0.1f, 100.0f);
-	shadowMap = new ShadowMap();
-	shadowMap->Init(shadowResolution, shadowResolution);
+	shadowMap = new ShadowMap(shadowResolution, shadowResolution);
+	shadowMap->Init();
 }
 
 void DirectionalLight::Use(GLuint colorLocation, GLuint directionLocation, GLuint aIntensityLocation, GLuint dIntensityLocation)

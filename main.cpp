@@ -283,11 +283,11 @@ int main()
 
 
 	mainLight = DirectionalLight(Light(Color::White, 0.3f, 0.1f), 2048, glm::vec3(0.0f, -7.0f, -1.0f));
-	PointLight pLight1 = PointLight(Light(Color::Red, 0.4f, 0.1f), glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
-	PointLight pLight2 = PointLight(Light(Color::Green, 0.4f, 0.1f), glm::vec3(2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
+	PointLight pLight1 = PointLight(Light(Color::Red, 0.4f, 0.1f), 2048, 20.0f, glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
+	PointLight pLight2 = PointLight(Light(Color::Green, 0.4f, 0.1f), 2048, 20.0f, glm::vec3(2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
 	pointLights.emplace_back(pLight1);
 	pointLights.emplace_back(pLight2);
-	SpotLight sLight1 = SpotLight(Light(Color::Blue, 1.0f, 1.0f), glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f), glm::vec3(0.0f, -1.0f, 0.0f), 20.0f);
+	SpotLight sLight1 = SpotLight(Light(Color::Blue, 1.0f, 1.0f), 2048, 20.0f, glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f), glm::vec3(0.0f, -1.0f, 0.0f), 20.0f);
 	spotLights.emplace_back(sLight1);
 
 	CalculateAverageNormal(pyramidVertices, pyramidIndices, 8, 5);
@@ -297,7 +297,7 @@ int main()
 
 	CreateShaders();
 
-	glm::mat4 projection = glm::perspective(45.0f, mainWindow.GetAspectRatio(), 0.1f, 100.0f);
+	glm::mat4 projection = glm::perspective(glm::radians(60.0f), mainWindow.GetAspectRatio(), 0.1f, 100.0f);
 
 	//Main Loop
 	while (!mainWindow.ShouldClose())

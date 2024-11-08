@@ -5,8 +5,8 @@ SpotLight::SpotLight() : PointLight(), direction(glm::vec3(0.0f, -1.0f, 0.0f)), 
 	processedRadius = cosf(glm::radians(radius));
 }
 
-SpotLight::SpotLight(Light light, glm::vec3 position, Quadratic<GLfloat> attenuation, glm::vec3 direction, GLfloat radius)
-	: PointLight(light, position, attenuation), radius(radius)
+SpotLight::SpotLight(Light light, GLuint shadowResolution, GLfloat farPlane, glm::vec3 position, Quadratic<GLfloat> attenuation, glm::vec3 direction, GLfloat radius)
+	: PointLight(light, shadowResolution, farPlane, position, attenuation), radius(radius)
 {
 	this->direction = glm::normalize(direction);
 	processedRadius = cosf(glm::radians(radius));
