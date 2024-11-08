@@ -201,8 +201,8 @@ void RenderFrame()
 void DirectionalShadowMapPass(DirectionalLight* dirLight)
 {
 	directionalShadow.Use();
-	glViewport(0, 0, dirLight->GetProperties().GetShadowMap()->GetShadowWidth(), dirLight->GetProperties().GetShadowMap()->GetShadowHeight());
-	dirLight->GetProperties().GetShadowMap()->Write();
+	glViewport(0, 0, dirLight->GetShadowMap()->GetShadowWidth(), dirLight->GetShadowMap()->GetShadowHeight());
+	dirLight->GetShadowMap()->Write();
 	glClear(GL_DEPTH_BUFFER_BIT);
 	uniformModel = directionalShadow.GetModelLocation();
 	directionalShadow.SetDirectionalLightTransform(dirLight->CalculateLightTransform());
@@ -254,7 +254,7 @@ void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 	shaders[0].SetSpotLights(&spotLights);
 	shaders[0].SetDirectionalLightTransform(mainLight.CalculateLightTransform());
 
-	mainLight.GetProperties().GetShadowMap()->Read(GL_TEXTURE1);
+	mainLight.GetShadowMap()->Read(GL_TEXTURE1);
 	shaders[0].SetTexture(0);
 	shaders[0].SetDirectionalShadowMap(1);
 
@@ -282,12 +282,12 @@ int main()
 	blackhawk.Load("Models/uh60.obj");
 
 
-	mainLight = DirectionalLight(Light(2048,Color::White, 0.3f, 0.1f), glm::vec3(0.0f, -7.0f, -1.0f));
-	PointLight pLight1 = PointLight(Light(2048,Color::Red, 0.4f, 0.1f), glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
-	PointLight pLight2 = PointLight(Light(2048,Color::Green, 0.4f, 0.1f), glm::vec3(2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
+	mainLight = DirectionalLight(Light(Color::White, 0.3f, 0.1f), 2048, glm::vec3(0.0f, -7.0f, -1.0f));
+	PointLight pLight1 = PointLight(Light(Color::Red, 0.4f, 0.1f), glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
+	PointLight pLight2 = PointLight(Light(Color::Green, 0.4f, 0.1f), glm::vec3(2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
 	pointLights.emplace_back(pLight1);
 	pointLights.emplace_back(pLight2);
-	SpotLight sLight1 = SpotLight(Light(2048,Color::Blue, 1.0f, 1.0f), glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f), glm::vec3(0.0f, -1.0f, 0.0f), 20.0f);
+	SpotLight sLight1 = SpotLight(Light(Color::Blue, 1.0f, 1.0f), glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f), glm::vec3(0.0f, -1.0f, 0.0f), 20.0f);
 	spotLights.emplace_back(sLight1);
 
 	CalculateAverageNormal(pyramidVertices, pyramidIndices, 8, 5);

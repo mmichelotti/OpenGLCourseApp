@@ -9,10 +9,8 @@ Light::Light()
 	diffuseIntensity = 0.0f;
 }
 
-Light::Light(GLfloat shadowResolution, Color color, GLfloat dIntensity, GLfloat aIntensity)
+Light::Light(Color color, GLfloat dIntensity, GLfloat aIntensity)
 {
-	shadowMap = new ShadowMap();
-	shadowMap->Init(shadowResolution, shadowResolution);
 	this->color = color;
 	this->ambientIntensity = aIntensity;
 	this->diffuseIntensity = dIntensity;

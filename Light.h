@@ -7,14 +7,12 @@ class Light
 {
 public:
 	Light();
-	Light(GLfloat shadowResolution, Color color, GLfloat dIntensity, GLfloat aIntensity);
+	Light(Color color, GLfloat dIntensity, GLfloat aIntensity);
 	void Use(GLuint colorLocation, GLuint dIntensityLocation, GLuint aIntensityLocation);
-	ShadowMap* GetShadowMap() { return shadowMap; }
 	Color color;
 	GLfloat ambientIntensity;
 	GLfloat diffuseIntensity;
 
 	glm::mat4 projection;
-	ShadowMap* shadowMap;
 };
 
