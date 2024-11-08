@@ -11,6 +11,7 @@ public:
 	void Use(GLuint colorLocation, GLuint positionLocation, GLuint aIntensityLocation, GLuint dIntensityLocation, GLuint constLocation, GLuint linLocation, GLuint expLocation);
 	std::vector<glm::mat4> CalculateLightTransform();
 	GLfloat GetFarPlane() { return farPlane; }
+	glm::vec3 GetPosition() { return position; }
 	ShadowMap* GetShadowMap() { return shadowMap; }
 protected:
 	ShadowMap* shadowMap;
