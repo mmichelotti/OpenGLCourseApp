@@ -71,7 +71,7 @@ bool Texture::LoadRGB()
 void Texture::Use()
 {
     //the sampler pass through the texture texture unit "GL_TEXTURE0" 1 / 2 / 3.... 32
-    glActiveTexture(GL_TEXTURE0);
+    glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, ID);
 }
 

@@ -65,7 +65,7 @@ Camera camera;
 std::vector<Mesh*> meshes;
 std::vector<Shader> shaders;
 Shader directionalShadow;
-Shader omnidirectionalShadow;
+Shader OmniShadow;
 
 
 Texture brickTXT;
@@ -172,7 +172,7 @@ void CreateShaders()
 	shaders.push_back(*shader1);
 	directionalShadow = Shader();
 	directionalShadow.CreateFromFile("Shaders/DirectionalShadowMap.vert", "Shaders/DirectionalShadowMap.frag");
-	omnidirectionalShadow.CreateFromFile("Shaders/OmniShadowMap.vert", "Shaders/OmniShadowMap.geom", "Shaders/OmniShadowMap.frag");
+	OmniShadow.CreateFromFile("Shaders/OmniShadowMap.vert", "Shaders/OmniShadowMap.geom", "Shaders/OmniShadowMap.frag");
 }
 void RenderFrame()
 {
@@ -211,25 +211,26 @@ void DirectionalShadowMapPass(DirectionalLight* dirLight)
 	glClear(GL_DEPTH_BUFFER_BIT);
 	uniformModel = directionalShadow.GetModelLocation();
 	directionalShadow.SetDirectionalLightTransform(dirLight->CalculateLightTransform());
+	directionalShadow.Validate();
 	RenderFrame();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void OmnidirectionalShadowMapPass(PointLight* pLight)
 {
-	omnidirectionalShadow.Use();
+	OmniShadow.Use();
 	glViewport(0, 0, pLight->GetShadowMap()->GetShadowWidth(), pLight->GetShadowMap()->GetShadowHeight());
 	pLight->GetShadowMap()->Write();
 	glClear(GL_DEPTH_BUFFER_BIT);
-	uniformModel = omnidirectionalShadow.GetModelLocation();
-	uniformOmniLightPos = omnidirectionalShadow.GetOmniLightPosLocation();
-	uniformOmniLightPos = omnidirectionalShadow.GetOmniLightPosLocation();
-	uniformFarPlane = omnidirectionalShadow.GetFarPlaneLocation();
+	uniformModel = OmniShadow.GetModelLocation();
+	uniformOmniLightPos = OmniShadow.GetOmniLightPosLocation();
+	uniformOmniLightPos = OmniShadow.GetOmniLightPosLocation();
+	uniformFarPlane = OmniShadow.GetFarPlaneLocation();
 
 	glUniform3f(uniformOmniLightPos, pLight->GetPosition().x, pLight->GetPosition().y, pLight->GetPosition().z);
 	glUniform1f(uniformFarPlane, pLight->GetFarPlane());
-	omnidirectionalShadow.SetLightMatrices(pLight->CalculateLightTransform());
-
+	OmniShadow.SetLightMatrices(pLight->CalculateLightTransform());
+	OmniShadow.Validate();
 	RenderFrame();
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -271,17 +272,18 @@ void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 	glUniform3f(uniformEyePosition, camera.GetCameraPosition().x, camera.GetCameraPosition().y, camera.GetCameraPosition().z);
 
 
+
 	spotLights.at(0).SetPositionAndDirection(camera.GetCameraPosition(), camera.GetCameraDirection());
 
 	shaders[0].SetDirectionalLight(&mainLight);
-	shaders[0].SetPointLights(&pointLights);
-	shaders[0].SetSpotLights(&spotLights);
+	shaders[0].SetPointLights(&pointLights, 3, 0);
+	shaders[0].SetSpotLights(&spotLights, 3 + pointLights.size(), pointLights.size());
 	shaders[0].SetDirectionalLightTransform(mainLight.CalculateLightTransform());
 
-	mainLight.GetShadowMap()->Read(GL_TEXTURE1);
-	shaders[0].SetTexture(0);
-	shaders[0].SetDirectionalShadowMap(1);
-
+	mainLight.GetShadowMap()->Read(GL_TEXTURE2);
+	shaders[0].SetTexture(1);
+	shaders[0].SetDirectionalShadowMap(2);
+	shaders[0].Validate();
 	RenderFrame();
 }
 int main()

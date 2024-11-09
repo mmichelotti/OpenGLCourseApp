@@ -38,6 +38,11 @@ struct SpotLight
     vec3 direction;
     float edge;
 };
+struct OmniShadowMap
+{
+    samplerCube shadowMap;
+    float farPlane;
+};
 struct Material
 {
     float specular;
@@ -52,8 +57,41 @@ uniform int pointLightCount;
 uniform int spotLightCount;
 uniform sampler2D theTexture;
 uniform sampler2D directionalShadowMap;
+uniform OmniShadowMap omniShadowMaps[MAX_POINT_LIGHTS + MAX_SPOT_LIGHTS];
 uniform Material material;
 uniform vec3 eyePosition;
+
+vec3 gridSamplingDisk[20] = vec3[]
+(
+   vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1), 
+   vec3(1, 1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+   vec3(1, 1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1, 1,  0),
+   vec3(1, 0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1, 0, -1),
+   vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
+);
+
+float CalculateOmniShadowFactor(PointLight light, int shadowIndex)
+{
+    vec3 fragToLight = FragPos - light.position;
+    float currentDepth = length(fragToLight);
+    float shadow = 0.0f;
+    float bias = 0.05f;
+    int samples = 20;
+    float viewDistance = length(eyePosition - FragPos);
+    float diskRadius = (1.0f + (viewDistance / omniShadowMaps[shadowIndex].farPlane)) / 25.0f;
+
+    for(int i = 0; i < samples; i++)
+    {
+        float closestDepth = texture(omniShadowMaps[shadowIndex].shadowMap, fragToLight + (gridSamplingDisk[i] * diskRadius)).r;
+        closestDepth *= omniShadowMaps[shadowIndex].farPlane;
+        if(currentDepth - bias > closestDepth)
+        {
+            shadow += 1.0f;
+        }
+    }
+    shadow /= float(samples);
+    return shadow;
+}
 
 float CalculateDirectionalShadowFactor(DirectionalLight light)
 {
@@ -113,27 +151,30 @@ vec4 CalculateLightByDirection(Light light, vec3 direction, float shadowFactor)
     }
     return vec4(ambientColor + (1.0f - shadowFactor) * (diffuseColor + specularColor), 1.0f);
 }
-vec4 CalculatePointLight(PointLight pLight)
+vec4 CalculatePointLight(PointLight pLight, int shadowIndex)
 {
         //ax^2 + bx + c
         vec3 difference = FragPos - pLight.position;
         vec3 direction = normalize(difference);
+
+        float shadowFactor = CalculateOmniShadowFactor(pLight, shadowIndex);
+
         float a = pLight.exponent;
         float x = length(difference);
         float b = pLight.linear;
         float c = pLight.constant;
         float attenuation = (a*x*x) + (b*x) + (c);
 
-        vec4 lightColor = CalculateLightByDirection(pLight.base, direction, 0.0f);
+        vec4 lightColor = CalculateLightByDirection(pLight.base, direction, shadowFactor);
         return (lightColor/attenuation);
 }
-vec4 CalculateSpotLight(SpotLight sLight)
+vec4 CalculateSpotLight(SpotLight sLight, int shadowIndex)
 {
     vec3 rayDirection = normalize(FragPos - sLight.base.position);
     float sLightFactor = dot(rayDirection, sLight.direction);
     if(sLightFactor > sLight.edge)
     {
-        vec4 color = CalculatePointLight(sLight.base);
+        vec4 color = CalculatePointLight(sLight.base, shadowIndex);
         //resize light factor and edge in 01 range
         return color * (1.0f - ((1.0f - sLightFactor) * (1.0f/(1.0f - sLight.edge))));
     }
@@ -147,7 +188,7 @@ vec4 PointLightsColor()
     vec4 color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
     for(int i = 0; i < pointLightCount; i++)
     {
-        color += CalculatePointLight(pointLights[i]);
+        color += CalculatePointLight(pointLights[i], i);
     };
     return color;
 };
@@ -156,7 +197,7 @@ vec4 SpotLightsColor()
     vec4 color = vec4(0.0f, 0.0f, 0.0f, 0.0f);
     for(int i = 0; i < spotLightCount; i++)
     {
-        color += CalculateSpotLight(spotLights[i]);
+        color += CalculateSpotLight(spotLights[i], i + pointLightCount);
     };
     return color;
 }
@@ -165,6 +206,7 @@ vec4 DirectionalLightColor()
     float shadowFactor = CalculateDirectionalShadowFactor(directionalLight);
     return CalculateLightByDirection(directionalLight.base, directionalLight.direction, shadowFactor);  
 }
+
 void main()			
 {	
     //texture() glsl method to sample a texture

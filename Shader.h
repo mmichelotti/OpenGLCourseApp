@@ -23,6 +23,7 @@ public:
 	void CreateFromString(const char* vertexCode, const char* fragmentCode);
 	void CreateFromFile(const char* vertexLocation, const char* fragmentLocation);
 	void CreateFromFile(const char* vertexLocation, const char* geometryLocation, const char* fragmentLocation);
+	void Validate();
 	std::string ReadFile(const char* fileLocation);
 
 	GLuint GetProjectionLocation() { return uniformProjection; }
@@ -42,8 +43,8 @@ public:
 	void Use();
 	void Clear();
 	void SetDirectionalLight(DirectionalLight* dirLight);
-	void SetPointLights(std::vector<PointLight>* pLight);
-	void SetSpotLights(std::vector<SpotLight>* sLights);
+	void SetPointLights(std::vector<PointLight>* pLight, unsigned int textureUnit, unsigned int offset);
+	void SetSpotLights(std::vector<SpotLight>* sLights, unsigned int textureUnit, unsigned int offset);
 	void SetTexture(GLuint textureUnit);
 	void SetDirectionalShadowMap(GLuint textureUnit);
 	void SetDirectionalLightTransform(const glm::mat4& transform);
@@ -103,6 +104,12 @@ private:
 		GLuint radius;
 
 	} uniformSpotLight[MAX_SPOT_LIGHTS];
+
+	struct
+	{
+		GLuint shadowMap;
+		GLuint farPlane;
+	} uniformOmniShadowMap[MAX_POINT_LIGHTS + MAX_SPOT_LIGHTS];
 	void Bind();
 	void Compile(const char* vertexCode, const char* fragmentCode);
 	void Compile(const char* vertexCode, const char* geometryCode, const char* fragmentCode);
