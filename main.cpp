@@ -339,12 +339,12 @@ int main()
 		{
 			OmnidirectionalShadowMapPass(&pointLights[i]);
 		}
-		/*
-		for (size_t i = 0; i < pointLights.size(); i++)
+		
+		for (size_t i = 0; i < spotLights.size(); i++)
 		{
 			OmnidirectionalShadowMapPass(&spotLights[i]);
 		}
-		*/
+		
 		RenderPass(projection, camera.ViewMatrix());
 		glUseProgram(0);
 		mainWindow.SwapBuffers();
