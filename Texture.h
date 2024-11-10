@@ -1,8 +1,8 @@
 #pragma once
 
 #include <GL\glew.h>
-#include "stb_image.h"
 #include "Vec2.h"
+#include "Global.h"
 
 class Texture
 {

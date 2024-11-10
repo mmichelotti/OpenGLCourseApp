@@ -27,6 +27,7 @@
     <ClCompile Include="OmniShadowMap.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="ShadowMap.cpp" />
+    <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="Transform.cpp" />
     <ClCompile Include="World.cpp" />
@@ -50,6 +51,7 @@
     <ClInclude Include="PointLight.h" />
     <ClInclude Include="Quadratic.h" />
     <ClInclude Include="ShadowMap.h" />
+    <ClInclude Include="Skybox.h" />
     <ClInclude Include="SpotLight.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="Texture.h" />

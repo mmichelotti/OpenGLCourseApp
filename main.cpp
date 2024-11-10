@@ -25,6 +25,7 @@
 #include "SpotLight.h"
 #include <assimp/Importer.hpp>
 #include "Object.h"
+#include "Skybox.h"
 
 //GL => The actual graphics API
 //GLEW => OpenGL Extensions for additional OpenGL features and extensions, since OpenGL can differ across platforms
@@ -74,6 +75,8 @@ Texture blankTXT;
 
 Material roughMaterial;
 Material dullMaterial;
+
+Skybox skybox;
 
 Object blackhawk;
 GLfloat blackhawkAngle = 0.0f;
@@ -253,6 +256,13 @@ void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 	to make translations absolute we need to apply them first
 	if we want them relative we need to apply after
 */
+	glViewport(0, 0, 1920, 1080);
+	//Clear the whole window
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); //Set it to white
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Clear other pixel informations (in this case color and depth buffer)
+
+	skybox.Draw(viewMatrix, projectionMatrix);
+
 	shaders[0].Use();
 
 	uniformModel = shaders[0].GetModelLocation();
@@ -262,10 +272,7 @@ void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 	uniformSpecular = shaders[0].GetSpecularLocation();
 	uniformRoughness = shaders[0].GetRoughnessLocation();
 
-	glViewport(0, 0, 1920, 1080);
-	//Clear the whole window
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); //Set it to white
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Clear other pixel informations (in this case color and depth buffer)
+
 
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
@@ -276,8 +283,8 @@ void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 	spotLights.at(0).SetPositionAndDirection(camera.GetCameraPosition(), camera.GetCameraDirection());
 
 	shaders[0].SetDirectionalLight(&mainLight);
-	shaders[0].SetPointLights(&pointLights, 3, 0);
-	shaders[0].SetSpotLights(&spotLights, 3 + pointLights.size(), pointLights.size());
+	//shaders[0].SetPointLights(&pointLights, 3, 0);
+	//shaders[0].SetSpotLights(&spotLights, 3 + pointLights.size(), pointLights.size());
 	shaders[0].SetDirectionalLightTransform(mainLight.CalculateLightTransform());
 
 	mainLight.GetShadowMap()->Read(GL_TEXTURE2);
@@ -308,7 +315,8 @@ int main()
 	blackhawk.Load("Models/uh60.obj");
 
 
-	mainLight = DirectionalLight(Light(Color::White, 0.3f, 0.1f), 2048, glm::vec3(0.0f, -7.0f, -1.0f));
+	mainLight = DirectionalLight(Light(Color(0.9f, 0.5f, 0.1f), 0.9f, 0.1f), 2048, glm::vec3(-10.0f, -12.0f, 18.5f));
+
 	PointLight pLight1 = PointLight(Light(Color::Red, 0.4f, 0.1f), 2048, 100.0f, glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
 	PointLight pLight2 = PointLight(Light(Color::Green, 0.4f, 0.1f), 2048, 100.0f, glm::vec3(2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
 	pointLights.emplace_back(pLight1);
@@ -317,6 +325,15 @@ int main()
 	spotLights.emplace_back(sLight1);
 
 	CalculateAverageNormal(pyramidVertices, pyramidIndices, 8, 5);
+
+	std::vector<std::string> skyboxFaces;
+	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_rt.tga");
+	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_lf.tga");
+	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_up.tga");
+	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_dn.tga");
+	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_bk.tga");
+	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_ft.tga");
+	skybox = Skybox(skyboxFaces);
 
 	AddMesh(pyramidVertices, pyramidIndices);
 	AddMesh(floorVertices, floorIndices);
