@@ -51,7 +51,7 @@ std::vector<Shader> shaders;
 Shader directionalShadow;
 Shader OmniShadow;
 
-Texture brickTXT, dirtTXT, blankTXT;
+Texture brickTXT, dirtTXT, blankTXT, concreteTXT;
 
 Material roughMAT, dullMAT;
 
@@ -79,7 +79,7 @@ void RenderFrame()
 	glm::mat4 model(1.0f);
 
 	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
+	model = glm::translate(model, glm::vec3(0.0f, 10.0f, 0.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	brickTXT.Use();
 	roughMAT.Use(uniformSpecular, uniformRoughness);
@@ -88,15 +88,15 @@ void RenderFrame()
 
 	model = glm::mat4(1.0f);
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	brickTXT.Use();
+	concreteTXT.Use();
 	dullMAT.Use(uniformSpecular, uniformRoughness);
 	meshes.at(1)->Render();
 
 	blackhawkAngle += 0.1f;
 	if (blackhawkAngle > 360) blackhawkAngle = 0.1f;
 
-	blackhawk.transform.SetPosition(glm::vec3(-8.0f, 2.0f, 0.0f));
-	blackhawk.transform.SetRotation(glm::vec3(-90.0f, blackhawkAngle, 0.0f));
+	blackhawk.transform.SetPosition(glm::vec3(0.0f, 2.0f, 0.0f));
+	blackhawk.transform.SetRotation(glm::vec3(-90.0f, 0.0f, blackhawkAngle));
 	blackhawk.transform.SetScale(glm::vec3(0.4f, 0.4f, 0.4f));
 	blackhawk.transform.UpdateModelMatrix(uniformModel);
 	roughMAT.Use(uniformSpecular, uniformRoughness);
@@ -159,7 +159,7 @@ void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 	spotLights.at(0).SetPositionAndDirection(camera.GetCameraPosition(), camera.GetCameraDirection());
 
 	shaders[0].SetDirectionalLight(&mainLight);
-	//shaders[0].SetPointLights(&pointLights, 3, 0);
+	shaders[0].SetPointLights(&pointLights, 3, 0);
 	//shaders[0].SetSpotLights(&spotLights, 3 + pointLights.size(), pointLights.size());
 	shaders[0].SetDirectionalLightTransform(mainLight.CalculateLightTransform());
 
@@ -176,11 +176,14 @@ int main()
 	camera = Camera(glm::vec3(0.0f, 4.0f, 4.0f), Vec2<GLfloat>(-90.0f, -45.0f));
 
 	brickTXT = Texture("Textures/brick.png");
-	brickTXT.LoadRGBA();
 	dirtTXT = Texture("Textures/dirt.png");
-	dirtTXT.LoadRGBA();
 	blankTXT = Texture("Textures/plain.png");
+	concreteTXT = Texture("Textures/concrete.png");
+
+	brickTXT.LoadRGBA();
+	dirtTXT.LoadRGBA();
 	blankTXT.LoadRGBA();
+	concreteTXT.LoadRGB();
 
 	roughMAT = Material(1.0f, 512);
 	dullMAT = Material(0.3f,4);
@@ -190,8 +193,8 @@ int main()
 
 	mainLight = DirectionalLight(Light(Color(0.9f, 0.5f, 0.1f), 0.9f, 0.1f), 2048, glm::vec3(-10.0f, -12.0f, 18.5f));
 
-	PointLight pLight1 = PointLight(Light(Color::Red, 0.4f, 0.1f), 2048, 100.0f, glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
-	PointLight pLight2 = PointLight(Light(Color::Green, 0.4f, 0.1f), 2048, 100.0f, glm::vec3(2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
+	PointLight pLight1 = PointLight(Light(Color::Red, 0.4f, 0.1f), 2048, 100.0f, glm::vec3(-2.0f, 4.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
+	PointLight pLight2 = PointLight(Light(Color::Green, 0.4f, 0.1f), 2048, 100.0f, glm::vec3(2.0f, 4.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f));
 	pointLights.emplace_back(pLight1);
 	pointLights.emplace_back(pLight2);
 	SpotLight sLight1 = SpotLight(Light(Color::Blue, 1.0f, 1.0f), 2048, 100.0f, glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f), glm::vec3(0.0f, -1.0f, 0.0f), 20.0f);
