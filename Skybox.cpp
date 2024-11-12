@@ -32,42 +32,9 @@ Skybox::Skybox(std::vector<std::string> faceLocation)
 	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR); //texture repeat along x axis
 
 	// Mesh Setup
-	std::vector<unsigned int> skyboxIndices = 
-	{
-		// front
-		0, 1, 2,
-		2, 1, 3,
-		// right
-		2, 3, 5,
-		5, 3, 7,
-		// back
-		5, 7, 4,
-		4, 7, 6,
-		// left
-		4, 6, 0,
-		0, 6, 1,
-		// top
-		4, 0, 5,
-		5, 0, 2,
-		// bottom
-		1, 6, 3,
-		3, 6, 7
-	};
 
-	std::vector<GLfloat> skyboxVertices = 
-	{
-		-1.0f, 1.0f, -1.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-		-1.0f, -1.0f, -1.0f,	0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-		1.0f, 1.0f, -1.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-		1.0f, -1.0f, -1.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
 
-		-1.0f, 1.0f, 1.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-		1.0f, 1.0f, 1.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-		-1.0f, -1.0f, 1.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-		1.0f, -1.0f, 1.0f,		0.0f, 0.0f,		0.0f, 0.0f, 0.0f
-	};
-
-	mesh = new Mesh(skyboxVertices, skyboxIndices);
+	mesh = new Mesh(CUBE);
 
 }
 

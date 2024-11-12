@@ -85,89 +85,6 @@ DirectionalLight mainLight;
 std::vector<PointLight> pointLights;
 std::vector<SpotLight> spotLights;
 
-std::vector<unsigned int> pyramidIndices = 
-{
-	0, 3, 1,
-	1, 3, 2,
-	2, 3, 0,
-	0, 1, 2
-};
-
-std::vector<GLfloat> pyramidVertices = 
-{
-//    x      y      z		 u     v		 r     g     b
-	-1.0f, -1.0f, -0.6f,	0.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-	 0.0f, -1.0f,  1.0f,	0.5f, 0.0f,		0.0f, 0.0f, 0.0f,
-	 1.0f, -1.0f, -0.6f,	1.0f, 0.0f,		0.0f, 0.0f, 0.0f,
-	 0.0f,  1.0f,  0.0f,	0.5f, 1.0f,		0.0f, 0.0f, 0.0f
-};
-
-
-std::vector<unsigned int> floorIndices = 
-{
-	0, 2, 1,
-	1, 2, 3
-};
-
-std::vector<GLfloat> floorVertices = 
-{
-	-10.0f, 0.0f, -10.0f,	0.0f, 0.0f,		0.0f, -1.0f, 0.0f,
-	10.0f, 0.0f, -10.0f,	10.0f, 0.0f,	0.0f, -1.0f, 0.0f,
-	-10.0f, 0.0f, 10.0f,	0.0f, 10.0f,	0.0f, -1.0f, 0.0f,
-	10.0f, 0.0f, 10.0f,		10.0f, 10.0f,	0.0f, -1.0f, 0.0f
-};
-
-void AddMesh(std::vector<GLfloat>& vertices, std::vector<unsigned int>& indices)
-{
-	meshes.push_back(new Mesh(vertices, indices));
-}
-void CalculateAverageNormal(std::vector<GLfloat>& vertices, std::vector<unsigned int>& indices, unsigned int vLength, unsigned int normalOffset)
-{
-	for (size_t i = 0; i < indices.size(); i += 3)
-	{
-		unsigned int in0 = indices[i + 0] * vLength;
-		unsigned int in1 = indices[i + 1] * vLength;
-		unsigned int in2 = indices[i + 2] * vLength;
-
-		float v1X = vertices[in1 + 0] - vertices[in0 + 0];
-		float v1Y = vertices[in1 + 1] - vertices[in0 + 1];
-		float v1Z = vertices[in1 + 2] - vertices[in0 + 2];
-
-		float v2X = vertices[in2 + 0] - vertices[in0 + 0];
-		float v2Y = vertices[in2 + 1] - vertices[in0 + 1];
-		float v2Z = vertices[in2 + 2] - vertices[in0 + 2];
-		
-		glm::vec3 v1(v1X, v1Y, v1Z);
-		glm::vec3 v2(v2X,v2Y,v2Z);
-		glm::vec3 normal = glm::cross(v1, v2);
-		normal = glm::normalize(normal);
-
-		in0 += normalOffset;
-		in1 += normalOffset;
-		in2 += normalOffset;
-
-		pyramidVertices[in0 + 0] += normal.x;
-		pyramidVertices[in0 + 1] += normal.y;
-		pyramidVertices[in0 + 2] += normal.z;
-
-		pyramidVertices[in1 + 0] += normal.x;
-		pyramidVertices[in1 + 1] += normal.y;
-		pyramidVertices[in1 + 2] += normal.z;
-
-		pyramidVertices[in2 + 0] += normal.x;
-		pyramidVertices[in2 + 1] += normal.y;
-		pyramidVertices[in2 + 2] += normal.z;
-	}
-	for (size_t i = 0; i < vertices.size() / vLength; i++)
-	{
-		unsigned int nOffset = (i * vLength) + normalOffset;
-		glm::vec3 vec(vertices[nOffset], vertices[nOffset+1], vertices[nOffset+2]);
-		vec = glm::normalize(vec);
-		vertices[nOffset + 0] = vec.x;
-		vertices[nOffset + 1] = vec.y;
-		vertices[nOffset + 2] = vec.z;
-	}
-}
 void CreateShaders() 
 {
 	Shader* shader1 = new Shader();
@@ -239,24 +156,9 @@ void OmnidirectionalShadowMapPass(PointLight* pLight)
 }
 void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 {
-	//Identity Matrix 
-/*
-	1 0 0 0
-	0 1 0 0
-	0 0 1 0
-	0 0 0 1
-*/
-	//Uniform variables are a constant through all the shader, not influenced by each single vertex
-/*
-	Of course the objects distorts becuase there is no projection matrix applied to the geometry
-	the default matrix system is the window coordinate system, so as we rotate an object on a non uniform window
-	the object will deform to match the window coordynate system
 
-	so the order matters, even when scaling
-	to make translations absolute we need to apply them first
-	if we want them relative we need to apply after
-*/
 	glViewport(0, 0, 1920, 1080);
+
 	//Clear the whole window
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f); //Set it to white
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //Clear other pixel informations (in this case color and depth buffer)
@@ -324,7 +226,6 @@ int main()
 	SpotLight sLight1 = SpotLight(Light(Color::Blue, 1.0f, 1.0f), 2048, 100.0f, glm::vec3(-2.0f, 2.0f, 0.0f), Quadratic(0.3f, 0.2f, 0.1f), glm::vec3(0.0f, -1.0f, 0.0f), 20.0f);
 	spotLights.emplace_back(sLight1);
 
-	CalculateAverageNormal(pyramidVertices, pyramidIndices, 8, 5);
 
 	std::vector<std::string> skyboxFaces;
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_rt.tga");
@@ -335,8 +236,9 @@ int main()
 	skyboxFaces.push_back("Textures/Skybox/cupertin-lake_ft.tga");
 	skybox = Skybox(skyboxFaces);
 
-	AddMesh(pyramidVertices, pyramidIndices);
-	AddMesh(floorVertices, floorIndices);
+	meshes.push_back(new Mesh(PYRAMID));
+	meshes.push_back(new Mesh(PLANE));
+
 
 	CreateShaders();
 
