@@ -1,6 +1,5 @@
 #include "Light.h"
 
-
 Light::Light()
 {
 	color = Color::White;

@@ -1,4 +1,4 @@
-#include "Object.h"
+#include "Model.h"
 #include "Global.h"
 
 
@@ -11,13 +11,13 @@
 
 
 
-Object::Object()
+Model::Model()
 {
 	transform = Transform();
 }
 
 
-void Object::Render()
+void Model::Render()
 {
 	if (!meshes[0]) return;
 	for (size_t i = 0; i < meshes.size(); i++)
@@ -33,7 +33,7 @@ void Object::Render()
 	}
 }
 
-void Object::Load(const std::string& fileName)
+void Model::Load(const std::string& fileName)
 {
 	Assimp::Importer importer;
 	const aiScene *scene = importer.ReadFile(fileName, aiProcess_Triangulate | aiProcess_FlipUVs | aiProcess_GenSmoothNormals | aiProcess_JoinIdenticalVertices);
@@ -48,7 +48,7 @@ void Object::Load(const std::string& fileName)
 	LoadMaterials(scene);
 }
 
-void Object::LoadNode(aiNode* node, const aiScene* scene)
+void Model::LoadNode(aiNode* node, const aiScene* scene)
 {
 	for (size_t i = 0; i < node->mNumMeshes; i++)
 	{
@@ -61,7 +61,7 @@ void Object::LoadNode(aiNode* node, const aiScene* scene)
 	}
 }
 
-std::vector<GLfloat> Object::GetVertexBuffer(const aiMesh* mesh)
+std::vector<GLfloat> Model::GetVertexBuffer(const aiMesh* mesh)
 {
 	std::vector<GLfloat> vertices;
 
@@ -80,7 +80,7 @@ std::vector<GLfloat> Object::GetVertexBuffer(const aiMesh* mesh)
 	return vertices;
 }
 
-std::vector<unsigned int> Object::GetIndexBuffer(const aiMesh* mesh)
+std::vector<unsigned int> Model::GetIndexBuffer(const aiMesh* mesh)
 {
 	std::vector<unsigned int> indices;
 	for (size_t i = 0; i < mesh->mNumFaces; i++)
@@ -94,14 +94,14 @@ std::vector<unsigned int> Object::GetIndexBuffer(const aiMesh* mesh)
 	return indices;
 }
 
-void Object::LoadMesh(const aiMesh* mesh)
+void Model::LoadMesh(const aiMesh* mesh)
 {
 	Mesh* newMesh = new Mesh(GetVertexBuffer(mesh), GetIndexBuffer(mesh));
 	meshes.push_back(newMesh);
 	meshToTex.push_back(mesh->mMaterialIndex);
 }
 
-void Object::LoadMaterials(const aiScene* scene)
+void Model::LoadMaterials(const aiScene* scene)
 {
 	textures.resize(scene->mNumMaterials);
 	
@@ -139,7 +139,7 @@ void Object::LoadMaterials(const aiScene* scene)
 	}
 }
 
-void Object::Clear()
+void Model::Clear()
 {
 	for (size_t i = 0; i < meshes.size(); i++)
 	{
@@ -152,7 +152,7 @@ void Object::Clear()
 	}
 }
 
-Object::~Object()
+Model::~Model()
 {
 	Clear();
 }

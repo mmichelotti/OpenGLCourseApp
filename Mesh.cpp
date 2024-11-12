@@ -1,9 +1,6 @@
 #include "Mesh.h"
 #include <vector>
 
-/// <summary>
-/// Constructor for class Mesh
-/// </summary>
 Mesh::Mesh() : VAO(0), VBO(0), IBO(0), indexCount(0), indices(), vertices() {}
 
 Mesh::Mesh(const std::vector<GLfloat>& vertices, const std::vector<unsigned int>& indices)

@@ -12,17 +12,18 @@
 #include "Texture.h"
 #include "Global.h"
 #include "Transform.h"
+#include "Material.h"
 
-class Object
+class Model
 {
 public:
-	Object();
+	Model();
 	Transform transform;
 	void Load(const std::string& fileName);
 	void Render();
 	void Clear();
 
-	~Object();
+	~Model();
 
 private:
 
@@ -32,6 +33,7 @@ private:
 	void LoadMesh(const aiMesh *mesh);
 	void LoadNode(aiNode *node, const aiScene *scene);
 	void LoadMaterials(const aiScene *scene);
+
 
 	std::vector<Mesh*> meshes;
 	std::vector<Texture*> textures;

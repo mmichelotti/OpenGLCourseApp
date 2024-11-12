@@ -24,24 +24,15 @@
 #include "PointLight.h"
 #include "SpotLight.h"
 #include <assimp/Importer.hpp>
-#include "Object.h"
+#include "Model.h"
 #include "Skybox.h"
 
-//GL => The actual graphics API
-//GLEW => OpenGL Extensions for additional OpenGL features and extensions, since OpenGL can differ across platforms
-//GLFW => Windows and input management
 /*
-GLFW (Graphics Library Framework) is responsible for creating and managing windows, 
-handling input (keyboard, mouse), and managing OpenGL contexts. 
-It doesn't interact with OpenGL directly to render graphics but helps set up the environment to use OpenGL. 
-It provides a platform-independent API for windowing and input.
+An index buffer is mostly identical to a vertex buffer
+The core difference is that the index buffer groups the vertices that are overlapping
+i.e. in the vertex buffer a cube is composed of 2 tris, which in total are 6 vertices
+th Index Buffer recycle those overlapping vertices, so it has a total of 4
 */
-
-const float toRadians = 3.14159265f / 180.0f; //converting a full circle from 2PI to 360*
-
-//Vertex and Fragment Shader files
-static const char* vShader = "Shaders/main.vert";
-static const char* fShader = "Shaders/main.frag";
 
 GLuint uniformProjection = 0;
 GLuint uniformModel = 0;
@@ -49,36 +40,24 @@ GLuint uniformView = 0;
 GLuint uniformEyePosition = 0;
 GLuint uniformOmniLightPos = 0;
 GLuint uniformFarPlane = 0;
-
-
 GLuint uniformSpecular = 0;
 GLuint uniformRoughness = 0;
-
-/*
-An index buffer is mostly identical to a vertex buffer
-The core difference is that the index buffer groups the vertices that are overlapping
-i.e. in the vertex buffer a cube is composed of 2 tris, which in total are 6 vertices 
-th Index Buffer recycle those overlapping vertices, so it has a total of 4
-*/
 
 Window mainWindow;
 Camera camera;
 std::vector<Mesh*> meshes;
+
 std::vector<Shader> shaders;
 Shader directionalShadow;
 Shader OmniShadow;
 
+Texture brickTXT, dirtTXT, blankTXT;
 
-Texture brickTXT;
-Texture dirtTXT;
-Texture blankTXT;
-
-Material roughMaterial;
-Material dullMaterial;
+Material roughMAT, dullMAT;
 
 Skybox skybox;
 
-Object blackhawk;
+Model blackhawk;
 GLfloat blackhawkAngle = 0.0f;
 
 DirectionalLight mainLight;
@@ -88,10 +67,11 @@ std::vector<SpotLight> spotLights;
 void CreateShaders() 
 {
 	Shader* shader1 = new Shader();
-	shader1->CreateFromFile(vShader, fShader);
+	shader1->CreateFromFile("Shaders/main.vert", "Shaders/main.frag");
 	shaders.push_back(*shader1);
 	directionalShadow = Shader();
 	directionalShadow.CreateFromFile("Shaders/DirectionalShadowMap.vert", "Shaders/DirectionalShadowMap.frag");
+	OmniShadow = Shader();
 	OmniShadow.CreateFromFile("Shaders/OmniShadowMap.vert", "Shaders/OmniShadowMap.geom", "Shaders/OmniShadowMap.frag");
 }
 void RenderFrame()
@@ -102,15 +82,14 @@ void RenderFrame()
 	model = glm::translate(model, glm::vec3(0.0f, 2.0f, 0.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
 	brickTXT.Use();
-	dullMaterial.Use(uniformSpecular, uniformRoughness);
+	roughMAT.Use(uniformSpecular, uniformRoughness);
 	meshes.at(0)->Render();
 
 
 	model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(0.0f, 0.0f, 0.0f));
 	glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-	dirtTXT.Use();
-	roughMaterial.Use(uniformSpecular, uniformRoughness);
+	brickTXT.Use();
+	dullMAT.Use(uniformSpecular, uniformRoughness);
 	meshes.at(1)->Render();
 
 	blackhawkAngle += 0.1f;
@@ -120,7 +99,7 @@ void RenderFrame()
 	blackhawk.transform.SetRotation(glm::vec3(-90.0f, blackhawkAngle, 0.0f));
 	blackhawk.transform.SetScale(glm::vec3(0.4f, 0.4f, 0.4f));
 	blackhawk.transform.UpdateModelMatrix(uniformModel);
-	dullMaterial.Use(uniformSpecular, uniformRoughness);
+	roughMAT.Use(uniformSpecular, uniformRoughness);
 	blackhawk.Render();
 }
 void DirectionalShadowMapPass(DirectionalLight* dirLight)
@@ -156,7 +135,6 @@ void OmnidirectionalShadowMapPass(PointLight* pLight)
 }
 void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 {
-
 	glViewport(0, 0, 1920, 1080);
 
 	//Clear the whole window
@@ -174,13 +152,9 @@ void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 	uniformSpecular = shaders[0].GetSpecularLocation();
 	uniformRoughness = shaders[0].GetRoughnessLocation();
 
-
-
 	glUniformMatrix4fv(uniformProjection, 1, GL_FALSE, glm::value_ptr(projectionMatrix));
 	glUniformMatrix4fv(uniformView, 1, GL_FALSE, glm::value_ptr(viewMatrix));
 	glUniform3f(uniformEyePosition, camera.GetCameraPosition().x, camera.GetCameraPosition().y, camera.GetCameraPosition().z);
-
-
 
 	spotLights.at(0).SetPositionAndDirection(camera.GetCameraPosition(), camera.GetCameraDirection());
 
@@ -197,7 +171,6 @@ void RenderPass(glm::mat4 projectionMatrix, glm::mat4 viewMatrix)
 }
 int main()
 {
-
 	mainWindow = Window(1920, 1080);
 	mainWindow.Initialize();
 	camera = Camera(glm::vec3(0.0f, 4.0f, 4.0f), Vec2<GLfloat>(-90.0f, -45.0f));
@@ -209,13 +182,11 @@ int main()
 	blankTXT = Texture("Textures/plain.png");
 	blankTXT.LoadRGBA();
 
-	roughMaterial = Material(1.0f, 512);
-	dullMaterial = Material(0.3f,4);
+	roughMAT = Material(1.0f, 512);
+	dullMAT = Material(0.3f,4);
 
-
-	blackhawk = Object();
+	blackhawk = Model();
 	blackhawk.Load("Models/uh60.obj");
-
 
 	mainLight = DirectionalLight(Light(Color(0.9f, 0.5f, 0.1f), 0.9f, 0.1f), 2048, glm::vec3(-10.0f, -12.0f, 18.5f));
 
@@ -238,6 +209,7 @@ int main()
 
 	meshes.push_back(new Mesh(PYRAMID));
 	meshes.push_back(new Mesh(PLANE));
+
 
 
 	CreateShaders();
